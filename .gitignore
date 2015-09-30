@@ -1,0 +1,40 @@
+# general garbage
+*~
+*.a
+*.o
+*.p_o
+*.dyn_o
+
+dist
+cabal-dev
+*.o
+*.hi
+*.chi
+*.chs.h
+.virtualenv
+.hsenv
+.HTF/
+.cabal-sandbox/
+cabal.sandbox.config
+cabal.config
+
+# eclipse stuff
+.dist-buildwrapper/
+.project
+.settings/
+docs/
+
+# leksah stuff
+*.lkshf
+*.lkshw
+
+# profiling
+*.hp
+*.prof
+*.htm
+*.html
+*.ps
+*.aux
+
+# my own stuff
+*.nb
