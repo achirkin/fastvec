@@ -20,6 +20,10 @@ description:
 category: Math, Geometry
 author: Artem M. Chirkin <chirkin@arch.ethz.ch>
 
+source-repository head
+  type:     git
+  location: git://github.com/achirkin/fastvec.git
+
 library
     exposed-modules:
         Data.Geometry
