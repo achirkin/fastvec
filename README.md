@@ -10,10 +10,12 @@ for vector operations like dot products or matrix products I use separate classe
 
 ### GHCJS support
 
-The library is compilable with GHCJS (Unfortunately, without tests yet).
-Additional tweaks have been made to do this more or less efficiently.
+The library is compilable with GHCJS 0.2 (unfortunately, without tests yet).
+Additional tweaks have been made to run vector math more or less efficiently.
 
-All vectors and matrices in GHCJS version of library are just plane JavaScript arrays of numbers.
-But in Haskell they presented the same way as x86 SIMD vectors and matrices;
-this makes it possible to write cross-platform x64-js programs with the same vector representations.
-I prefered plane arrays over typed arrays in order to be able to work with (Geo)JSON objects without any convertion of types: now coordinate arrays in GeoJSON are exactly the same thing as vectors in Haskell!
+All vectors and matrices in GHCJS version of the library are just plane JavaScript arrays of numbers.
+But in Haskell they are presented the same way as x86_64 SIMD vectors and matrices;
+this makes it possible to write cross-platform x86_64-JS programs using the same data types.
+I prefer the plane arrays over the typed arrays in order to be able to work with (Geo)JSON objects without any conversion of types: coordinate arrays in GeoJSON are exactly the same thing as vectors in Haskell!
+
+No SIMD in JS yet (because SIMD.js is not yet ready, and because now I use plane arrays).
