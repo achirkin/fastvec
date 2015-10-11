@@ -2,6 +2,11 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, TypeFamilies, DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE CPP #-}
+#if defined(ghcjs_HOST_OS)
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UndecidableInstances #-}
+#else
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Geometry.Types
@@ -16,12 +21,99 @@
 
 module Data.Geometry.Types where
 
+import Data.Geometry.VectorMath
+
+
+#if defined(ghcjs_HOST_OS)
+
+import GHCJS.Types
+--import GHCJS.Internal.Types
+import Data.Geometry.Prim.JSNum
+--import Unsafe.Coerce
+import GHC.TypeLits (KnownNat)
+
+instance (KnownNat n, JSNum a) => VectorMath n a where
+    {-# SPECIALIZE instance VectorMath 4 Int #-}
+    {-# SPECIALIZE instance VectorMath 4 Float #-}
+    {-# SPECIALIZE instance VectorMath 4 Double #-}
+    {-# INLINE eye #-}
+    eye = toMatrix . eyeJSMat $ dim (undefined :: Matrix n a)
+    {-# INLINE diag #-}
+    diag x = toMatrix . diagJSMat (fromNum x) $ dim (undefined :: Matrix n a)
+    {-# INLINE transpose #-}
+    transpose m = toMatrix . transposeJSMat (jsref m) . dim $ m
+    {-# INLINE det #-}
+    det m = toNum . detJSMat (jsref m) . dim $ m
+    {-# INLINE trace #-}
+    trace m = toNum . traceJSMat (jsref m) . dim $ m
+    {-# INLINE fromDiag #-}
+    fromDiag m = toVector . fromDiagJSMat (jsref m) . dim $ m
+    {-# INLINE toDiag #-}
+    toDiag = toMatrix . toDiagJSMat . jsref
+    {-# INLINE (.*.) #-}
+    a .*. b = toVector $ dotBJSVec (jsref a) (jsref b)
+    {-# INLINE dot #-}
+    dot a b = toNum $ dotJSVec (jsref a) (jsref b)
+
+
+instance JSNum a => Vector4Math a where
+    {-# SPECIALIZE instance Vector4Math Int #-}
+    {-# SPECIALIZE instance Vector4Math Float #-}
+    {-# SPECIALIZE instance Vector4Math Double #-}
+    {-# INLINE vector4 #-}
+    vector4 a b c d = toVector $ jsVector4 (fromNum a) (fromNum b) (fromNum c) (fromNum d)
+    {-# INLINE matrix4x4 #-}
+    matrix4x4 a b c d = toMatrix $ jsMatrix4 (jsref a) (jsref b) (jsref c) (jsref d)
+
+instance JSNum a => Vector3Math a where
+    {-# SPECIALIZE instance Vector3Math Int #-}
+    {-# SPECIALIZE instance Vector3Math Float #-}
+    {-# SPECIALIZE instance Vector3Math Double #-}
+    {-# INLINE vector3 #-}
+    vector3 a b c = toVector $ jsVector3 (fromNum a) (fromNum b) (fromNum c)
+    {-# INLINE matrix3x3 #-}
+    matrix3x3 a b c = toMatrix $ jsMatrix3 (jsref a) (jsref b) (jsref c)
+
+instance JSNum a => Vector2Math a where
+    {-# SPECIALIZE instance Vector2Math Int #-}
+    {-# SPECIALIZE instance Vector2Math Float #-}
+    {-# SPECIALIZE instance Vector2Math Double #-}
+    {-# INLINE vector2 #-}
+    vector2 a b = toVector $ jsVector2 (fromNum a) (fromNum b)
+    {-# INLINE matrix2x2 #-}
+    matrix2x2 a b = toMatrix $ jsMatrix2 (jsref a) (jsref b)
+
+instance (JSNum a, KnownNat n) => MatrixProduct Matrix n a where
+    prod a b = toMatrix $ prodJSMM (jsref a) (jsref b) (dim b)
+
+instance (JSNum a, KnownNat n) => MatrixProduct Vector n a where
+    prod a b = toVector $ prodJSMV (jsref a) (jsref b)
+
+instance JSNum a => VectorFracMath 4 a where
+    {-# SPECIALIZE instance VectorFracMath 4 Float #-}
+    {-# SPECIALIZE instance VectorFracMath 4 Double #-}
+    {-# INLINE inverse #-}
+    inverse = toMatrix . inverseJSM4 . jsref
+
+instance JSNum a => VectorFracMath 3 a where
+    {-# SPECIALIZE instance VectorFracMath 3 Float #-}
+    {-# SPECIALIZE instance VectorFracMath 3 Double #-}
+    {-# INLINE inverse #-}
+    inverse = toMatrix . inverseJSM3 . jsref
+
+instance JSNum a => VectorFracMath 2 a where
+    {-# SPECIALIZE instance VectorFracMath 2 Float #-}
+    {-# SPECIALIZE instance VectorFracMath 2 Double #-}
+    {-# INLINE inverse #-}
+    inverse = toMatrix . inverseJSM2 . jsref
+
+#else
+
 import GHC.Exts
 import GHC.Int
 
 import Foreign.C.Types
 
-import Data.Geometry.VectorMath
 import Data.Geometry.Prim.Int32X4
 import Data.Geometry.Prim.FloatX3
 import Data.Geometry.Prim.FloatX4
@@ -219,3 +311,5 @@ instance VectorFracMath 3 T where {                               \
 
 VECTORFRACMATH3(Float,FloatX3#,V3F,M3F)
 VECTORFRACMATH3(CFloat,FloatX3#,V3CF,M3CF)
+
+#endif

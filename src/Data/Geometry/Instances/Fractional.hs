@@ -2,6 +2,10 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, TypeFamilies, DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE CPP #-}
+#if defined(ghcjs_HOST_OS)
+{-# LANGUAGE ScopedTypeVariables #-}
+#else
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Geometry.Instances.Fractional
@@ -17,15 +21,60 @@
 
 module Data.Geometry.Instances.Fractional () where
 
+
+import Data.Geometry.VectorMath
+import Data.Geometry.Instances.Num ()
+
+
+#if defined(ghcjs_HOST_OS)
+
+import GHC.TypeLits (KnownNat)
+
+import Data.Geometry.Prim.JSNum
+
+import GHCJS.Types
+
+instance (KnownNat n, JSNum t, Fractional t) => Fractional (Vector n t) where
+    {-# SPECIALIZE instance Fractional (Vector 4 Float) #-}
+    {-# SPECIALIZE instance Fractional (Vector 4 Double) #-}
+    {-# SPECIALIZE instance Fractional (Vector 3 Float) #-}
+    {-# SPECIALIZE instance Fractional (Vector 3 Double) #-}
+    {-# SPECIALIZE instance Fractional (Vector 2 Float) #-}
+    {-# SPECIALIZE instance Fractional (Vector 2 Double) #-}
+    {-# INLINE (/) #-}
+    a / b = toVector $ divideJSVec (jsref a) (jsref b)
+    {-# INLINE recip #-}
+    recip a = toVector $ recipJSVec (jsref a)
+    {-# INLINE fromRational #-}
+    fromRational i = v
+        where v = toVector . broadcastJSVec (fromNum (fromRational i :: t)) $ dim v
+
+instance (KnownNat n, JSNum t, Fractional t) => Fractional (Matrix n t) where
+    {-# SPECIALIZE instance Fractional (Matrix 4 Float) #-}
+    {-# SPECIALIZE instance Fractional (Matrix 4 Double) #-}
+    {-# SPECIALIZE instance Fractional (Matrix 3 Float) #-}
+    {-# SPECIALIZE instance Fractional (Matrix 3 Double) #-}
+    {-# SPECIALIZE instance Fractional (Matrix 2 Float) #-}
+    {-# SPECIALIZE instance Fractional (Matrix 2 Double) #-}
+    {-# INLINE (/) #-}
+    a / b = toMatrix $ divideJSVec (jsref a) (jsref b)
+    {-# INLINE recip #-}
+    recip a = toMatrix $ recipJSVec (jsref a)
+    {-# INLINE fromRational #-}
+    fromRational i = v
+        where v = toMatrix $ broadcastJSVec (fromNum (fromRational i :: t)) (n*n)
+              n = dim v
+
+
+#else
+
 import GHC.Exts
 
 import Foreign.C.Types
 
-import Data.Geometry.VectorMath
 import Data.Geometry.Prim.FloatX3
 import Data.Geometry.Prim.FloatX4
 import Data.Geometry.Types
-import Data.Geometry.Instances.Num ()
 
 #define emptyc(x) x
 
@@ -86,3 +135,4 @@ instance Fractional (Matrix 3 T) where {                           \
 FRACATIONAL3M(Float,FloatX3#,M3F,F#, emptyc)
 FRACATIONAL3M(CFloat,FloatX3#,M3CF,F#,CFloat)
 
+#endif

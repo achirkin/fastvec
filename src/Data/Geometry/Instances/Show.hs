@@ -17,12 +17,32 @@
 
 module Data.Geometry.Instances.Show () where
 
+
+
+import Data.Geometry.VectorMath
+
+#if defined(ghcjs_HOST_OS)
+
+import GHC.TypeLits (KnownNat)
+import GHCJS.Types
+import GHCJS.Prim
+
+import Data.Geometry.Prim.JSNum
+
+instance Show (Vector n a) where
+    show = fromJSString . jsref . showJSVec . jsref
+
+instance KnownNat n => Show (Matrix n a) where
+    show m = fromJSString . jsref . showJSMat (jsref m) $ dim m
+
+
+#else
+
 import GHC.Exts
 import GHC.Int
 
 import Foreign.C.Types
 
-import Data.Geometry.VectorMath
 import Data.Geometry.Prim.FloatX3
 import Data.Geometry.Types
 
@@ -73,3 +93,5 @@ instance Show (Matrix 3 T) where {     \
 
 SHOW3(Float,FloatX3#,V3F,M3F,F#,emptyc)
 SHOW3(CFloat,FloatX3#,V3CF,M3CF,F#,CFloat)
+
+#endif

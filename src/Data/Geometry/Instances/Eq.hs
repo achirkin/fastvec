@@ -18,12 +18,33 @@
 module Data.Geometry.Instances.Eq () where
 
 
+import Data.Geometry.VectorMath
+
+#if defined(ghcjs_HOST_OS)
+
+import Data.Geometry.Prim.JSNum
+
+import GHCJS.Types
+
+instance Eq (Vector n t) where
+    {-# INLINE (==) #-}
+    a == b = eqJSVec (jsref a) (jsref b)
+    {-# INLINE (/=) #-}
+    a /= b = neqJSVec (jsref a) (jsref b)
+
+instance Eq (Matrix n t) where
+    {-# INLINE (==) #-}
+    a == b = eqJSVec (jsref a) (jsref b)
+    {-# INLINE (/=) #-}
+    a /= b = neqJSVec (jsref a) (jsref b)
+
+#else
+
 import GHC.Exts
 import GHC.Int
 
 import Foreign.C.Types
 
-import Data.Geometry.VectorMath
 import Data.Geometry.Prim.Int32X4
 import Data.Geometry.Prim.FloatX3
 import Data.Geometry.Prim.FloatX4
@@ -93,3 +114,5 @@ instance Eq (Matrix 3 T) where {                                       \
 
 EQ3(Float,FloatX3#,V3F,M3F,15#)
 EQ3(CFloat,FloatX3#,V3CF,M3CF,15#)
+
+#endif

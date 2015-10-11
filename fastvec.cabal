@@ -21,45 +21,118 @@ category: Math, Geometry
 author: Artem M. Chirkin <chirkin@arch.ethz.ch>
 
 source-repository head
-  type:     git
-  location: git://github.com/achirkin/fastvec.git
+    type: git
+    location: git://github.com/achirkin/fastvec.git
 
 library
+
+    if impl(ghcjs -any)
+        build-depends:
+            base >=4.8.0.0 && <4.9,
+            ghcjs-base ==0.2.*,
+            ghcjs-prim ==0.1.*
+        cpp-options: -DUSE_JAVASCRIPTFFI
+        other-modules:
+            Data.Geometry.Types
+            Data.Geometry.Instances.Eq
+            Data.Geometry.Instances.FloatingJS
+            Data.Geometry.Instances.Fractional
+            Data.Geometry.Instances.Num
+            Data.Geometry.Instances.Ord
+            Data.Geometry.Instances.Show
+            Data.Geometry.Instances.Storable
+            Data.Geometry.Prim.JSNum
+        ghc-options: -Wall -O2
+
+    if !impl(ghcjs -any)
+        build-depends:
+            base >=4.8.0.0 && <4.9,
+            ghc-prim >=0.4 && <0.5
+        other-modules:
+            Data.Geometry.Types
+            Data.Geometry.Instances.Eq
+            Data.Geometry.Instances.Floating3
+            Data.Geometry.Instances.Floating4
+            Data.Geometry.Instances.Fractional
+            Data.Geometry.Instances.Num
+            Data.Geometry.Instances.Ord
+            Data.Geometry.Instances.Show
+            Data.Geometry.Instances.Storable
+            Data.Geometry.Prim.FloatX3
+            Data.Geometry.Prim.FloatX4
+            Data.Geometry.Prim.Int32X4
+        ghc-options: -Wall -fllvm -O2 -mavx2
     exposed-modules:
         Data.Geometry
         Data.Geometry.VectorMath
-    build-depends:
-        base >=4.8.1.0 && <4.9,
-        ghc-prim >=0.4 && <0.5
+    js-sources:
+        prims/JSNumberOps.js
     default-language: Haskell2010
     hs-source-dirs: src
-    other-modules:
-        Data.Geometry.Types
-        Data.Geometry.Instances.Eq
-        Data.Geometry.Instances.Floating3
-        Data.Geometry.Instances.Floating4
-        Data.Geometry.Instances.Fractional
-        Data.Geometry.Instances.Num
-        Data.Geometry.Instances.Ord
-        Data.Geometry.Instances.Show
-        Data.Geometry.Instances.Storable
-        Data.Geometry.Prim.FloatX3
-        Data.Geometry.Prim.FloatX4
-        Data.Geometry.Prim.Int32X4
-    ghc-options: -Wall -fllvm -O2 -mavx2
+
+executable TempTests
+
+    if impl(ghcjs -any)
+        build-depends:
+            base >=4.8.0.0 && <4.9,
+            ghcjs-base ==0.2.*,
+            ghcjs-prim ==0.1.*
+        cpp-options: -DUSE_JAVASCRIPTFFI
+        other-modules:
+            Data.Geometry
+            Data.Geometry.VectorMath
+            Data.Geometry.Types
+            Data.Geometry.Instances.Eq
+            Data.Geometry.Instances.FloatingJS
+            Data.Geometry.Instances.Fractional
+            Data.Geometry.Instances.Num
+            Data.Geometry.Instances.Ord
+            Data.Geometry.Instances.Show
+            Data.Geometry.Instances.Storable
+            Data.Geometry.Prim.JSNum
+        ghc-options: -Wall -O2
+
+    if !impl(ghcjs -any)
+        build-depends:
+            base >=4.8.0.0 && <4.9,
+            ghc-prim >=0.4 && <0.5
+        other-modules:
+            Data.Geometry
+            Data.Geometry.VectorMath
+            Data.Geometry.Types
+            Data.Geometry.Instances.Eq
+            Data.Geometry.Instances.Floating3
+            Data.Geometry.Instances.Floating4
+            Data.Geometry.Instances.Fractional
+            Data.Geometry.Instances.Num
+            Data.Geometry.Instances.Ord
+            Data.Geometry.Instances.Show
+            Data.Geometry.Instances.Storable
+            Data.Geometry.Prim.FloatX3
+            Data.Geometry.Prim.FloatX4
+            Data.Geometry.Prim.Int32X4
+        ghc-options: -Wall -fllvm -O2 -mavx2
+    main-is: Main.hs
+    js-sources:
+        prims/JSNumberOps.js
+    default-language: Haskell2010
+    hs-source-dirs: src
 
 test-suite VectorTests
+
+    if !impl(ghcjs -any)
+        build-depends:
+            HTF -any,
+            fastvec -any,
+            template-haskell >=2.10.0.0 && <2.11
+        other-modules:
+            VectorTests.VectorGenerators
+            VectorTests.TH
+            VectorTests.TestNum
+        ghc-options: -Wall -fllvm -O2
     type: exitcode-stdio-1.0
     main-is: VectorTests.hs
     build-depends:
-        base >=4 && <5,
-        HTF -any,
-        fastvec -any,
-        template-haskell >=2.10.0.0 && <2.11
+        base >=4 && <5
     default-language: Haskell2010
     hs-source-dirs: test
-    other-modules:
-        VectorTests.VectorGenerators
-        VectorTests.TH
-        VectorTests.TestNum
-    ghc-options: -Wall -fllvm -O2

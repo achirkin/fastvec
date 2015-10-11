@@ -61,4 +61,3 @@ $(writeTests VecMat [''Num]
         |]
     )
  )
-
