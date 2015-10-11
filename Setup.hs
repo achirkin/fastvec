@@ -1,7 +1,11 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE CPP #-}
 module Main (main) where
 
 import Distribution.Simple
+
+#if defined(ghcjs_HOST_OS)
+#else
 import Distribution.PackageDescription
 import Distribution.Simple.Setup
 import Distribution.Simple.Program.Types
@@ -12,8 +16,12 @@ import Control.Monad (liftM)
 import Data.Maybe (fromMaybe)
 
 import System.Directory
+#endif
 
 main :: IO ()
+#if defined(ghcjs_HOST_OS)
+main = defaultMain
+#else
 main = defaultMainWithHooks simpleUserHooks
          { confHook = customConfHook (confHook simpleUserHooks)
          , regHook  = customRegHook  (regHook  simpleUserHooks)
@@ -59,3 +67,5 @@ getAdditionalFiles distDir = do
         objFiles = map ((distDir ++) . ('/':) . reverse . ('o':) . drop 2 . reverse) llvmFiles
     return (llvmFiles, objFiles)
     where primsDir = "prims/"
+
+#endif

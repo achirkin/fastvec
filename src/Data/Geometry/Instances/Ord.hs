@@ -17,19 +17,65 @@
 
 module Data.Geometry.Instances.Ord () where
 
+import Data.Geometry.VectorMath
+import Data.Geometry.Instances.Eq ()
+
+#if defined(ghcjs_HOST_OS)
+
+import Data.Geometry.Prim.JSNum
+
+import GHCJS.Types
+
+instance Ord (Vector n t) where
+    {-# INLINE (>) #-}
+    a > b = gtJSVec (jsref a) (jsref b)
+    {-# INLINE (<) #-}
+    a < b = ltJSVec (jsref a) (jsref b)
+    {-# INLINE (>=) #-}
+    a >= b = geJSVec (jsref a) (jsref b)
+    {-# INLINE (<=) #-}
+    a <= b = leJSVec (jsref a) (jsref b)
+    {-# INLINE max #-}
+    max a b = toVector $ maxJSVec (jsref a) (jsref b)
+    {-# INLINE min #-}
+    min a b = toVector $ minJSVec (jsref a) (jsref b)
+    {-# INLINE compare #-}
+    compare a b = case cmpJSVec (jsref a) (jsref b) of
+        1  -> GT
+        -1 -> LT
+        _  -> EQ
+
+instance Ord (Matrix n t) where
+    {-# INLINE (>) #-}
+    a > b = gtJSVec (jsref a) (jsref b)
+    {-# INLINE (<) #-}
+    a < b = ltJSVec (jsref a) (jsref b)
+    {-# INLINE (>=) #-}
+    a >= b = geJSVec (jsref a) (jsref b)
+    {-# INLINE (<=) #-}
+    a <= b = leJSVec (jsref a) (jsref b)
+    {-# INLINE max #-}
+    max a b = toMatrix $ maxJSVec (jsref a) (jsref b)
+    {-# INLINE min #-}
+    min a b = toMatrix $ minJSVec (jsref a) (jsref b)
+    {-# INLINE compare #-}
+    compare a b = case cmpJSVec (jsref a) (jsref b) of
+        1  -> GT
+        -1 -> LT
+        _  -> EQ
+
+#else
 
 import GHC.Exts
 import GHC.Int
 
 import Foreign.C.Types
 
-import Data.Geometry.VectorMath
 import Data.Geometry.Prim.Int32X4
 import Data.Geometry.Prim.FloatX3
 import Data.Geometry.Prim.FloatX4
 import Data.Geometry.Types
 
-import Data.Geometry.Instances.Eq ()
 
 -- params: type, vectortype, Vector constr, Matrix constr, True value in Int32#
 #define ORD4(T,VT,VC,MC,TRUE)                                      \
@@ -165,3 +211,5 @@ instance Ord (Matrix 3 T) where {                                  \
 
 ORD3(Float,FloatX3#,V3F,M3F,15#)
 ORD3(CFloat,FloatX3#,V3CF,M3CF,15#)
+
+#endif

@@ -21,8 +21,8 @@ class MultitypeTestSuite name where
 
 -- | Write a single test, with specified type signature and name
 writeTest :: (TypeQ -> Q [Dec]) -> (String, TypeQ, Integer, Name) -> Q [(Dec, Maybe (Name, Name))]
-writeTest test (t, typeQ, dim, typeName) = liftM
-    (renameFuncSuf $ nameBase typeName ++ t ++ "X" ++ show dim)
+writeTest test (t, typeQ, di, typeName) = liftM
+    (renameFuncSuf $ nameBase typeName ++ t ++ "X" ++ show di)
     (test typeQ)
 
 -- | Append suffix to the names of the functions
@@ -100,9 +100,7 @@ getVectorMathTypes :: [Name] -> Q [(Integer, Name)]
 getVectorMathTypes classes = do
     ClassI _ instances <- reify ''VectorMath
     let vtypes = sortTypes
-            $ map ( \(InstanceD _ (AppT (AppT _ (LitT (NumTyLit dim))) (ConT typeName)) _)
-                    -> (dim,typeName)
-                  ) instances
+            $ instances >>= getDimName
     types <- liftM (map ((,) 0) . foldl1' (intersectBy ( (==) `on` nameBase )
                             )) $ mapM findInstances classes
     return $ intersectBy ( (==) `on` (nameBase . snd) ) vtypes types
@@ -112,12 +110,14 @@ getVectorMathTypes classes = do
                    $ is >>= getIName
           getIName (InstanceD _ (AppT _ (ConT tn)) _ ) = [tn]
           getIName _ = []
+          getDimName (InstanceD _ (AppT (AppT _ (LitT (NumTyLit di))) (ConT typeName)) _) = [(di,typeName)]
+          getDimName _ = []
 
 makeMatrixType :: (Integer, Name) -> TypeQ
-makeMatrixType (dim, name) = pure $ ConT ''Matrix `AppT` LitT (NumTyLit dim) `AppT` ConT name
+makeMatrixType (di, name) = pure $ ConT ''Matrix `AppT` LitT (NumTyLit di) `AppT` ConT name
 
 makeVectorType :: (Integer, Name) -> TypeQ
-makeVectorType (dim, name) = pure $ ConT ''Vector `AppT` LitT (NumTyLit dim) `AppT` ConT name
+makeVectorType (di, name) = pure $ ConT ''Vector `AppT` LitT (NumTyLit di) `AppT` ConT name
 
 
 

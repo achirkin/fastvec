@@ -1,8 +1,12 @@
-{-# LANGUAGE MagicHash, UnboxedTuples #-}
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, TypeFamilies, DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE CPP #-}
 
+#if defined(ghcjs_HOST_OS)
+{-# LANGUAGE ScopedTypeVariables #-}
+#else
+{-# LANGUAGE MagicHash, UnboxedTuples #-}
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Geometry.Instances.Storable
@@ -19,14 +23,150 @@
 module Data.Geometry.Instances.Storable () where
 
 
-import GHC.Exts
-import GHC.Int
-import GHC.Base (IO (..))
-
-import Foreign.C.Types
 import Foreign.Storable
+import Foreign.C.Types
+import Data.Int
+import Data.Word
 
 import Data.Geometry.VectorMath
+
+
+#if defined(ghcjs_HOST_OS)
+
+import GHC.TypeLits (KnownNat)
+import GHCJS.Prim
+
+import Data.Geometry.Prim.JSNum
+
+import GHCJS.Types
+
+#define STORABLEV(T,JSType,JSSize) \
+instance (KnownNat n) => Storable (Vector n T) where { \
+    {-# SPECIALIZE instance Storable (Vector 4 T) #-};\
+    {-# SPECIALIZE instance Storable (Vector 3 T) #-};\
+    {-# SPECIALIZE instance Storable (Vector 2 T) #-};\
+    {-# INLINE sizeOf #-};\
+    sizeOf _ = div JSSize 8 * dim (undefined :: Vector n T);\
+    {-# INLINE alignment #-};\
+    alignment _ = div JSSize 8;\
+    {-# INLINE peekElemOff #-};\
+    peekElemOff ptr offset = case fromPtr ptr of {\
+        JSRef ref -> return\
+                . toVector\
+                . readElemOffJSVec/**/JSType/**/JSSize ref (offset*dim (undefined :: Vector n T))\
+                $ dim (undefined :: Vector n T)};\
+    {-# INLINE peekByteOff #-};\
+    peekByteOff ptr offset = case fromPtr ptr of {\
+        JSRef ref -> return\
+                . toVector\
+                . readByteOffJSVec/**/JSType/**/JSSize ref offset\
+                $ dim (undefined :: Vector n T)};\
+    {-# INLINE peek #-};\
+    peek ptr = case fromPtr ptr of {\
+        JSRef ref -> return\
+                . toVector\
+                . readElemOffJSVec/**/JSType/**/JSSize ref 0\
+                $ dim (undefined :: Vector n T)};\
+    {-# INLINE pokeElemOff #-};\
+    pokeElemOff ptr offset v = case fromPtr ptr of {\
+        JSRef ref -> writeElemOffJSVec/**/JSType/**/JSSize ref (offset*dim (undefined :: Vector n T)) (jsref v)};\
+    {-# INLINE pokeByteOff #-};\
+    pokeByteOff ptr offset v = case fromPtr ptr of {\
+        JSRef ref -> writeByteOffJSVec/**/JSType/**/JSSize ref offset (jsref v)};\
+    {-# INLINE poke #-};\
+    poke ptr v = case fromPtr ptr of {\
+        JSRef ref -> writeElemOffJSVec/**/JSType/**/JSSize ref 0 (jsref v)}}
+
+STORABLEV(Int,Int,32)
+STORABLEV(Int32,Int,32)
+STORABLEV(Int16,Int,16)
+STORABLEV(Int8,Int,8)
+STORABLEV(Word,Uint,32)
+STORABLEV(Word32,Uint,32)
+STORABLEV(Word16,Uint,16)
+STORABLEV(Word8,Uint,8)
+STORABLEV(Float,Float,32)
+STORABLEV(Double,Float,64)
+STORABLEV(CChar,Int,8)
+STORABLEV(CSChar,Int,8)
+STORABLEV(CUChar,Uint,8)
+STORABLEV(CShort,Int,16)
+STORABLEV(CUShort,Uint,16)
+STORABLEV(CInt,Int,32)
+STORABLEV(CUInt,Uint,32)
+STORABLEV(CLong,Int,32)
+STORABLEV(CULong,Uint,32)
+STORABLEV(CFloat,Float,32)
+STORABLEV(CDouble,Float,64)
+
+
+#define STORABLEM(T,JSType,JSSize) \
+instance (KnownNat n) => Storable (Matrix n T) where { \
+    {-# SPECIALIZE instance Storable (Matrix 4 T) #-};\
+    {-# SPECIALIZE instance Storable (Matrix 3 T) #-};\
+    {-# SPECIALIZE instance Storable (Matrix 2 T) #-};\
+    {-# INLINE sizeOf #-};\
+    sizeOf _ = case dim (undefined :: Vector n T) of {n -> div JSSize 8 *n*n};\
+    {-# INLINE alignment #-};\
+    alignment _ = div JSSize 8;\
+    {-# INLINE peekElemOff #-};\
+    peekElemOff ptr offset = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
+        (JSRef ref, n) -> return\
+                . toMatrix\
+                . readElemOffJSVec/**/JSType/**/JSSize ref (offset*n*n)\
+                $ n*n};\
+    {-# INLINE peekByteOff #-};\
+    peekByteOff ptr offset = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
+        (JSRef ref, n) -> return\
+                . toMatrix\
+                . readByteOffJSVec/**/JSType/**/JSSize ref offset\
+                $ n*n};\
+    {-# INLINE peek #-};\
+    peek ptr = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
+        (JSRef ref, n) -> return\
+                . toMatrix\
+                . readElemOffJSVec/**/JSType/**/JSSize ref 0\
+                $ n*n};\
+    {-# INLINE pokeElemOff #-};\
+    pokeElemOff ptr offset v = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
+        (JSRef ref,n) -> writeElemOffJSVec/**/JSType/**/JSSize ref (offset*n*n) (jsref v)};\
+    {-# INLINE pokeByteOff #-};\
+    pokeByteOff ptr offset v = case fromPtr ptr of {\
+        JSRef ref -> writeByteOffJSVec/**/JSType/**/JSSize ref offset (jsref v)};\
+    {-# INLINE poke #-};\
+    poke ptr v = case fromPtr ptr of {\
+        JSRef ref -> writeElemOffJSVec/**/JSType/**/JSSize ref 0 (jsref v)}}
+
+
+STORABLEM(Int,Int,32)
+STORABLEM(Int32,Int,32)
+STORABLEM(Int16,Int,16)
+STORABLEM(Int8,Int,8)
+STORABLEM(Word,Uint,32)
+STORABLEM(Word32,Uint,32)
+STORABLEM(Word16,Uint,16)
+STORABLEM(Word8,Uint,8)
+STORABLEM(Float,Float,32)
+STORABLEM(Double,Float,64)
+STORABLEM(CChar,Int,8)
+STORABLEM(CSChar,Int,8)
+STORABLEM(CUChar,Uint,8)
+STORABLEM(CShort,Int,16)
+STORABLEM(CUShort,Uint,16)
+STORABLEM(CInt,Int,32)
+STORABLEM(CUInt,Uint,32)
+STORABLEM(CLong,Int,32)
+STORABLEM(CULong,Uint,32)
+STORABLEM(CFloat,Float,32)
+STORABLEM(CDouble,Float,64)
+
+#else
+
+
+import GHC.Exts
+import GHC.Base (IO (..))
+
+
 import Data.Geometry.Types
 
 #define emptyc(x) x
@@ -140,3 +280,5 @@ instance Storable (Matrix 3 T) where {     \
 
 STORABLE3M(Float,FloatX4,M3F,48,16,16)
 STORABLE3M(CFloat,FloatX4,M3CF,48,16,16)
+
+#endif

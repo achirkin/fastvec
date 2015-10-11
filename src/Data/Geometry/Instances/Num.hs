@@ -18,12 +18,76 @@
 module Data.Geometry.Instances.Num () where
 
 
+import Data.Geometry.VectorMath
+
+#if defined(ghcjs_HOST_OS)
+
+import GHC.TypeLits (KnownNat)
+
+import Data.Geometry.Prim.JSNum
+
+import GHCJS.Types
+
+instance KnownNat n => Num (Vector n t) where
+    {-# SPECIALIZE instance Num (Vector 4 Float) #-}
+    {-# SPECIALIZE instance Num (Vector 4 Double) #-}
+    {-# SPECIALIZE instance Num (Vector 4 Int) #-}
+    {-# SPECIALIZE instance Num (Vector 3 Float) #-}
+    {-# SPECIALIZE instance Num (Vector 3 Double) #-}
+    {-# SPECIALIZE instance Num (Vector 3 Int) #-}
+    {-# SPECIALIZE instance Num (Vector 2 Float) #-}
+    {-# SPECIALIZE instance Num (Vector 2 Double) #-}
+    {-# SPECIALIZE instance Num (Vector 2 Int) #-}
+    {-# INLINE (+) #-}
+    a + b = toVector $ plusJSVec (jsref a) (jsref b)
+    {-# INLINE (-) #-}
+    a - b = toVector $ minusJSVec (jsref a) (jsref b)
+    {-# INLINE (*) #-}
+    a * b = toVector $ timesJSVec (jsref a) (jsref b)
+    {-# INLINE negate #-}
+    negate = toVector . negateJSVec . jsref
+    {-# INLINE abs #-}
+    abs = toVector . absJSVec . jsref
+    {-# INLINE signum #-}
+    signum = toVector . signumJSVec . jsref
+    {-# INLINE fromInteger #-}
+    fromInteger i = v
+        where v = toVector . broadcastJSVec (fromNum (fromInteger i :: Int)) $ dim v
+
+instance KnownNat n => Num (Matrix n t) where
+    {-# SPECIALIZE instance Num (Matrix 4 Float) #-}
+    {-# SPECIALIZE instance Num (Matrix 4 Double) #-}
+    {-# SPECIALIZE instance Num (Matrix 4 Int) #-}
+    {-# SPECIALIZE instance Num (Matrix 3 Float) #-}
+    {-# SPECIALIZE instance Num (Matrix 3 Double) #-}
+    {-# SPECIALIZE instance Num (Matrix 3 Int) #-}
+    {-# SPECIALIZE instance Num (Matrix 2 Float) #-}
+    {-# SPECIALIZE instance Num (Matrix 2 Double) #-}
+    {-# SPECIALIZE instance Num (Matrix 2 Int) #-}
+    {-# INLINE (+) #-}
+    a + b = toMatrix $ plusJSVec (jsref a) (jsref b)
+    {-# INLINE (-) #-}
+    a - b = toMatrix $ minusJSVec (jsref a) (jsref b)
+    {-# INLINE (*) #-}
+    a * b = toMatrix $ timesJSVec (jsref a) (jsref b)
+    {-# INLINE negate #-}
+    negate = toMatrix . negateJSVec . jsref
+    {-# INLINE abs #-}
+    abs = toMatrix . absJSVec . jsref
+    {-# INLINE signum #-}
+    signum = toMatrix . signumJSVec . jsref
+    {-# INLINE fromInteger #-}
+    fromInteger i = v
+        where v = toMatrix $ broadcastJSVec (fromNum (fromInteger i :: Int)) (n*n)
+              n = dim v
+
+#else
+
 import GHC.Exts
 import GHC.Int
 
 import Foreign.C.Types
 
-import Data.Geometry.VectorMath
 import Data.Geometry.Prim.Int32X4
 import Data.Geometry.Prim.FloatX3
 import Data.Geometry.Prim.FloatX4
@@ -147,3 +211,5 @@ instance Num (Matrix 3 T) where {                                 \
 
 NUM3M(Float,FloatX3#,M3F,F#, emptyc)
 NUM3M(CFloat,FloatX3#,M3CF,F#,CFloat)
+
+#endif

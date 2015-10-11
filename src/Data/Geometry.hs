@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Geometry
@@ -15,16 +16,20 @@ module Data.Geometry
     ) where
 
 
-import Data.Geometry.Types                as X ()
-import Data.Geometry.Instances.Num        as X ()
-import Data.Geometry.Instances.Eq         as X ()
-import Data.Geometry.Instances.Ord        as X ()
-import Data.Geometry.Instances.Show       as X ()
-import Data.Geometry.Instances.Fractional as X ()
+#if defined(ghcjs_HOST_OS)
+import Data.Geometry.Instances.FloatingJS as X ()
+#else
 import Data.Geometry.Instances.Floating3  as X ()
 import Data.Geometry.Instances.Floating4  as X ()
-import Data.Geometry.Instances.Storable   as X ()
+#endif
+import Data.Geometry.Types                as X ()
 import Data.Geometry.VectorMath           as X
+import Data.Geometry.Instances.Eq         as X ()
+import Data.Geometry.Instances.Ord        as X ()
+import Data.Geometry.Instances.Num        as X ()
+import Data.Geometry.Instances.Fractional as X ()
+import Data.Geometry.Instances.Show       as X ()
+import Data.Geometry.Instances.Storable   as X ()
 
 
 
