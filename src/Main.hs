@@ -37,7 +37,7 @@ main = do
     print $ a .*. b
     print $ dot a b
     putStrLn "hello world!"
---    printRef $ jsref m
+--    printRef $ coerce m
     print m
     print $ trace m
     print $ det m

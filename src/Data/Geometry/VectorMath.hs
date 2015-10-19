@@ -3,6 +3,7 @@
 {-# LANGUAGE CPP #-}
 #if defined(ghcjs_HOST_OS)
 {-# OPTIONS_GHC -fno-warn-unused-binds #-}
+{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving #-}
 #else
 {-# LANGUAGE TypeFamilies #-}
 #endif
@@ -27,8 +28,7 @@ module Data.Geometry.VectorMath
     , MatrixProduct (..)
     , VectorFracMath (..)
 #if defined(ghcjs_HOST_OS)
-    , Vector (), Matrix ()
-    , toVector, toMatrix
+    , Vector (..), Matrix (..)
     , Dimensional (..)
 #endif
     ) where
@@ -36,20 +36,25 @@ module Data.Geometry.VectorMath
 import GHC.TypeLits
 
 #if defined(ghcjs_HOST_OS)
+
+import Data.Typeable
 import GHCJS.Types
-import Unsafe.Coerce
-import Data.Proxy (Proxy(..))
+import GHCJS.Marshal.Pure
 
-newtype Vector (n :: Nat) t = V JSRef
-instance IsJSRef (Vector n a)
-newtype Matrix (n :: Nat) t = M JSRef
-instance IsJSRef (Matrix n a)
+newtype Vector (n :: Nat) t = JSVector JSVal deriving Typeable
+instance IsJSVal (Vector n t)
+newtype Matrix (n :: Nat) t = JSMatrix JSVal deriving Typeable
+instance IsJSVal (Matrix n t)
 
-toVector :: JSRef -> Vector n t
-toVector = unsafeCoerce
+instance PToJSVal (Vector n t) where
+    pToJSVal (JSVector v) = v
+instance PFromJSVal (Vector n t) where
+    pFromJSVal = JSVector
 
-toMatrix :: JSRef -> Matrix n t
-toMatrix = unsafeCoerce
+instance PToJSVal (Matrix n t) where
+    pToJSVal (JSMatrix v) = v
+instance PFromJSVal (Matrix n t) where
+    pFromJSVal = JSMatrix
 
 class Dimensional a where
     dim :: a -> Int

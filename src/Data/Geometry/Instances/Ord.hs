@@ -22,44 +22,45 @@ import Data.Geometry.Instances.Eq ()
 
 #if defined(ghcjs_HOST_OS)
 
+import Data.Coerce (coerce)
+
 import Data.Geometry.Prim.JSNum
 
-import GHCJS.Types
 
 instance Ord (Vector n t) where
     {-# INLINE (>) #-}
-    a > b = gtJSVec (jsref a) (jsref b)
+    a > b = gtJSVec (coerce a) (coerce b)
     {-# INLINE (<) #-}
-    a < b = ltJSVec (jsref a) (jsref b)
+    a < b = ltJSVec (coerce a) (coerce b)
     {-# INLINE (>=) #-}
-    a >= b = geJSVec (jsref a) (jsref b)
+    a >= b = geJSVec (coerce a) (coerce b)
     {-# INLINE (<=) #-}
-    a <= b = leJSVec (jsref a) (jsref b)
+    a <= b = leJSVec (coerce a) (coerce b)
     {-# INLINE max #-}
-    max a b = toVector $ maxJSVec (jsref a) (jsref b)
+    max a b = coerce $ maxJSVec (coerce a) (coerce b)
     {-# INLINE min #-}
-    min a b = toVector $ minJSVec (jsref a) (jsref b)
+    min a b = coerce $ minJSVec (coerce a) (coerce b)
     {-# INLINE compare #-}
-    compare a b = case cmpJSVec (jsref a) (jsref b) of
+    compare a b = case cmpJSVec (coerce a) (coerce b) of
         1  -> GT
         -1 -> LT
         _  -> EQ
 
 instance Ord (Matrix n t) where
     {-# INLINE (>) #-}
-    a > b = gtJSVec (jsref a) (jsref b)
+    a > b = gtJSVec (coerce a) (coerce b)
     {-# INLINE (<) #-}
-    a < b = ltJSVec (jsref a) (jsref b)
+    a < b = ltJSVec (coerce a) (coerce b)
     {-# INLINE (>=) #-}
-    a >= b = geJSVec (jsref a) (jsref b)
+    a >= b = geJSVec (coerce a) (coerce b)
     {-# INLINE (<=) #-}
-    a <= b = leJSVec (jsref a) (jsref b)
+    a <= b = leJSVec (coerce a) (coerce b)
     {-# INLINE max #-}
-    max a b = toMatrix $ maxJSVec (jsref a) (jsref b)
+    max a b = coerce $ maxJSVec (coerce a) (coerce b)
     {-# INLINE min #-}
-    min a b = toMatrix $ minJSVec (jsref a) (jsref b)
+    min a b = coerce $ minJSVec (coerce a) (coerce b)
     {-# INLINE compare #-}
-    compare a b = case cmpJSVec (jsref a) (jsref b) of
+    compare a b = case cmpJSVec (coerce a) (coerce b) of
         1  -> GT
         -1 -> LT
         _  -> EQ
