@@ -22,21 +22,22 @@ import Data.Geometry.VectorMath
 
 #if defined(ghcjs_HOST_OS)
 
+import Data.Coerce (coerce)
+
 import Data.Geometry.Prim.JSNum
 
-import GHCJS.Types
 
 instance Eq (Vector n t) where
     {-# INLINE (==) #-}
-    a == b = eqJSVec (jsref a) (jsref b)
+    a == b = eqJSVec (coerce a) (coerce b)
     {-# INLINE (/=) #-}
-    a /= b = neqJSVec (jsref a) (jsref b)
+    a /= b = neqJSVec (coerce a) (coerce b)
 
 instance Eq (Matrix n t) where
     {-# INLINE (==) #-}
-    a == b = eqJSVec (jsref a) (jsref b)
+    a == b = eqJSVec (coerce a) (coerce b)
     {-# INLINE (/=) #-}
-    a /= b = neqJSVec (jsref a) (jsref b)
+    a /= b = neqJSVec (coerce a) (coerce b)
 
 #else
 

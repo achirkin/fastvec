@@ -33,12 +33,13 @@ import Data.Geometry.VectorMath
 
 #if defined(ghcjs_HOST_OS)
 
+import Data.Coerce (coerce)
+
 import GHC.TypeLits (KnownNat)
 import GHCJS.Prim
+import GHCJS.Types
 
 import Data.Geometry.Prim.JSNum
-
-import GHCJS.Types
 
 #define STORABLEV(T,JSType,JSSize) \
 instance (KnownNat n) => Storable (Vector n T) where { \
@@ -51,31 +52,31 @@ instance (KnownNat n) => Storable (Vector n T) where { \
     alignment _ = div JSSize 8;\
     {-# INLINE peekElemOff #-};\
     peekElemOff ptr offset = case fromPtr ptr of {\
-        JSRef ref -> return\
-                . toVector\
+        JSVal ref -> return\
+                . coerce\
                 . readElemOffJSVec/**/JSType/**/JSSize ref (offset*dim (undefined :: Vector n T))\
                 $ dim (undefined :: Vector n T)};\
     {-# INLINE peekByteOff #-};\
     peekByteOff ptr offset = case fromPtr ptr of {\
-        JSRef ref -> return\
-                . toVector\
+        JSVal ref -> return\
+                . coerce\
                 . readByteOffJSVec/**/JSType/**/JSSize ref offset\
                 $ dim (undefined :: Vector n T)};\
     {-# INLINE peek #-};\
     peek ptr = case fromPtr ptr of {\
-        JSRef ref -> return\
-                . toVector\
+        JSVal ref -> return\
+                . coerce\
                 . readElemOffJSVec/**/JSType/**/JSSize ref 0\
                 $ dim (undefined :: Vector n T)};\
     {-# INLINE pokeElemOff #-};\
     pokeElemOff ptr offset v = case fromPtr ptr of {\
-        JSRef ref -> writeElemOffJSVec/**/JSType/**/JSSize ref (offset*dim (undefined :: Vector n T)) (jsref v)};\
+        JSVal ref -> writeElemOffJSVec/**/JSType/**/JSSize ref (offset*dim (undefined :: Vector n T)) (coerce v)};\
     {-# INLINE pokeByteOff #-};\
     pokeByteOff ptr offset v = case fromPtr ptr of {\
-        JSRef ref -> writeByteOffJSVec/**/JSType/**/JSSize ref offset (jsref v)};\
+        JSVal ref -> writeByteOffJSVec/**/JSType/**/JSSize ref offset (coerce v)};\
     {-# INLINE poke #-};\
     poke ptr v = case fromPtr ptr of {\
-        JSRef ref -> writeElemOffJSVec/**/JSType/**/JSSize ref 0 (jsref v)}}
+        JSVal ref -> writeElemOffJSVec/**/JSType/**/JSSize ref 0 (coerce v)}}
 
 STORABLEV(Int,Int,32)
 STORABLEV(Int32,Int,32)
@@ -111,31 +112,31 @@ instance (KnownNat n) => Storable (Matrix n T) where { \
     alignment _ = div JSSize 8;\
     {-# INLINE peekElemOff #-};\
     peekElemOff ptr offset = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
-        (JSRef ref, n) -> return\
-                . toMatrix\
+        (JSVal ref, n) -> return\
+                . coerce\
                 . readElemOffJSVec/**/JSType/**/JSSize ref (offset*n*n)\
                 $ n*n};\
     {-# INLINE peekByteOff #-};\
     peekByteOff ptr offset = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
-        (JSRef ref, n) -> return\
-                . toMatrix\
+        (JSVal ref, n) -> return\
+                . coerce\
                 . readByteOffJSVec/**/JSType/**/JSSize ref offset\
                 $ n*n};\
     {-# INLINE peek #-};\
     peek ptr = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
-        (JSRef ref, n) -> return\
-                . toMatrix\
+        (JSVal ref, n) -> return\
+                . coerce\
                 . readElemOffJSVec/**/JSType/**/JSSize ref 0\
                 $ n*n};\
     {-# INLINE pokeElemOff #-};\
     pokeElemOff ptr offset v = case (fromPtr ptr, dim (undefined :: Vector n T)) of {\
-        (JSRef ref,n) -> writeElemOffJSVec/**/JSType/**/JSSize ref (offset*n*n) (jsref v)};\
+        (JSVal ref,n) -> writeElemOffJSVec/**/JSType/**/JSSize ref (offset*n*n) (coerce v)};\
     {-# INLINE pokeByteOff #-};\
     pokeByteOff ptr offset v = case fromPtr ptr of {\
-        JSRef ref -> writeByteOffJSVec/**/JSType/**/JSSize ref offset (jsref v)};\
+        JSVal ref -> writeByteOffJSVec/**/JSType/**/JSSize ref offset (coerce v)};\
     {-# INLINE poke #-};\
     poke ptr v = case fromPtr ptr of {\
-        JSRef ref -> writeElemOffJSVec/**/JSType/**/JSSize ref 0 (jsref v)}}
+        JSVal ref -> writeElemOffJSVec/**/JSType/**/JSSize ref 0 (coerce v)}}
 
 
 STORABLEM(Int,Int,32)

@@ -23,17 +23,17 @@ import Data.Geometry.VectorMath
 
 #if defined(ghcjs_HOST_OS)
 
+import Data.Coerce (coerce)
+import Data.JSString (unpack')
 import GHC.TypeLits (KnownNat)
-import GHCJS.Types
-import GHCJS.Prim
 
 import Data.Geometry.Prim.JSNum
 
 instance Show (Vector n a) where
-    show = fromJSString . jsref . showJSVec . jsref
+    show = unpack' . showJSVec . coerce
 
 instance KnownNat n => Show (Matrix n a) where
-    show m = fromJSString . jsref . showJSMat (jsref m) $ dim m
+    show m = unpack' . showJSMat (coerce m) $ dim m
 
 
 #else

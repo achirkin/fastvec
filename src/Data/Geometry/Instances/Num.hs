@@ -22,11 +22,12 @@ import Data.Geometry.VectorMath
 
 #if defined(ghcjs_HOST_OS)
 
+import Data.Coerce (coerce)
 import GHC.TypeLits (KnownNat)
+
 
 import Data.Geometry.Prim.JSNum
 
-import GHCJS.Types
 
 instance KnownNat n => Num (Vector n t) where
     {-# SPECIALIZE instance Num (Vector 4 Float) #-}
@@ -39,20 +40,20 @@ instance KnownNat n => Num (Vector n t) where
     {-# SPECIALIZE instance Num (Vector 2 Double) #-}
     {-# SPECIALIZE instance Num (Vector 2 Int) #-}
     {-# INLINE (+) #-}
-    a + b = toVector $ plusJSVec (jsref a) (jsref b)
+    a + b = coerce $ plusJSVec (coerce a) (coerce b)
     {-# INLINE (-) #-}
-    a - b = toVector $ minusJSVec (jsref a) (jsref b)
+    a - b = coerce $ minusJSVec (coerce a) (coerce b)
     {-# INLINE (*) #-}
-    a * b = toVector $ timesJSVec (jsref a) (jsref b)
+    a * b = coerce $ timesJSVec (coerce a) (coerce b)
     {-# INLINE negate #-}
-    negate = toVector . negateJSVec . jsref
+    negate = coerce . negateJSVec . coerce
     {-# INLINE abs #-}
-    abs = toVector . absJSVec . jsref
+    abs = coerce . absJSVec . coerce
     {-# INLINE signum #-}
-    signum = toVector . signumJSVec . jsref
+    signum = coerce . signumJSVec . coerce
     {-# INLINE fromInteger #-}
     fromInteger i = v
-        where v = toVector . broadcastJSVec (fromNum (fromInteger i :: Int)) $ dim v
+        where v = coerce . broadcastJSVec (fromNum (fromInteger i :: Int)) $ dim v
 
 instance KnownNat n => Num (Matrix n t) where
     {-# SPECIALIZE instance Num (Matrix 4 Float) #-}
@@ -65,20 +66,20 @@ instance KnownNat n => Num (Matrix n t) where
     {-# SPECIALIZE instance Num (Matrix 2 Double) #-}
     {-# SPECIALIZE instance Num (Matrix 2 Int) #-}
     {-# INLINE (+) #-}
-    a + b = toMatrix $ plusJSVec (jsref a) (jsref b)
+    a + b = coerce $ plusJSVec (coerce a) (coerce b)
     {-# INLINE (-) #-}
-    a - b = toMatrix $ minusJSVec (jsref a) (jsref b)
+    a - b = coerce $ minusJSVec (coerce a) (coerce b)
     {-# INLINE (*) #-}
-    a * b = toMatrix $ timesJSVec (jsref a) (jsref b)
+    a * b = coerce $ timesJSVec (coerce a) (coerce b)
     {-# INLINE negate #-}
-    negate = toMatrix . negateJSVec . jsref
+    negate = coerce . negateJSVec . coerce
     {-# INLINE abs #-}
-    abs = toMatrix . absJSVec . jsref
+    abs = coerce . absJSVec . coerce
     {-# INLINE signum #-}
-    signum = toMatrix . signumJSVec . jsref
+    signum = coerce . signumJSVec . coerce
     {-# INLINE fromInteger #-}
     fromInteger i = v
-        where v = toMatrix $ broadcastJSVec (fromNum (fromInteger i :: Int)) (n*n)
+        where v = coerce $ broadcastJSVec (fromNum (fromInteger i :: Int)) (n*n)
               n = dim v
 
 #else

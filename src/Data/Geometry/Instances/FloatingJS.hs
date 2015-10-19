@@ -17,16 +17,16 @@
 
 module Data.Geometry.Instances.FloatingJS () where
 
+
+import Data.Coerce (coerce)
+import GHC.TypeLits (KnownNat)
+
+import Data.Geometry.Prim.JSNum
 import Data.Geometry.VectorMath
 import Data.Geometry.Instances.Num ()
 import Data.Geometry.Instances.Fractional ()
 
 
-import GHC.TypeLits (KnownNat)
-
-import Data.Geometry.Prim.JSNum
-
-import GHCJS.Types
 
 instance (KnownNat n, JSNum t, Floating t)
          => Floating (Vector n t) where
@@ -37,39 +37,39 @@ instance (KnownNat n, JSNum t, Floating t)
     {-# SPECIALIZE instance Floating (Vector 2 Float) #-}
     {-# SPECIALIZE instance Floating (Vector 2 Double) #-}
     {-# INLINE pi #-}
-    pi = toVector . piJSVec $ dim (undefined :: Vector n t)
+    pi = coerce . piJSVec $ dim (undefined :: Vector n t)
     {-# INLINE exp #-}
-    exp = toVector . expJSVec . jsref
+    exp = coerce . expJSVec . coerce
     {-# INLINE log #-}
-    log = toVector . logJSVec . jsref
+    log = coerce . logJSVec . coerce
     {-# INLINE (**) #-}
-    a ** b = toVector $ powerJSVec (jsref a) (jsref b)
+    a ** b = coerce $ powerJSVec (coerce a) (coerce b)
     {-# INLINE sqrt #-}
-    sqrt = toVector . sqrtJSVec . jsref
+    sqrt = coerce . sqrtJSVec . coerce
     {-# INLINE sin #-}
-    sin = toVector . sinJSVec . jsref
+    sin = coerce . sinJSVec . coerce
     {-# INLINE cos #-}
-    cos = toVector . cosJSVec . jsref
+    cos = coerce . cosJSVec . coerce
     {-# INLINE tan #-}
-    tan = toVector . tanJSVec . jsref
+    tan = coerce . tanJSVec . coerce
     {-# INLINE asin #-}
-    asin = toVector . asinJSVec . jsref
+    asin = coerce . asinJSVec . coerce
     {-# INLINE acos #-}
-    acos = toVector . acosJSVec . jsref
+    acos = coerce . acosJSVec . coerce
     {-# INLINE atan #-}
-    atan = toVector . atanJSVec . jsref
+    atan = coerce . atanJSVec . coerce
     {-# INLINE sinh #-}
-    sinh = toVector . sinhJSVec . jsref
+    sinh = coerce . sinhJSVec . coerce
     {-# INLINE cosh #-}
-    cosh = toVector . coshJSVec . jsref
+    cosh = coerce . coshJSVec . coerce
     {-# INLINE tanh #-}
-    tanh = toVector . tanhJSVec . jsref
+    tanh = coerce . tanhJSVec . coerce
     {-# INLINE asinh #-}
-    asinh = toVector . asinhJSVec . jsref
+    asinh = coerce . asinhJSVec . coerce
     {-# INLINE acosh #-}
-    acosh = toVector . acoshJSVec . jsref
+    acosh = coerce . acoshJSVec . coerce
     {-# INLINE atanh #-}
-    atanh = toVector . atanhJSVec . jsref
+    atanh = coerce . atanhJSVec . coerce
 
 
 instance (KnownNat n, JSNum t, Floating t)
@@ -81,37 +81,37 @@ instance (KnownNat n, JSNum t, Floating t)
     {-# SPECIALIZE instance Floating (Matrix 2 Float) #-}
     {-# SPECIALIZE instance Floating (Matrix 2 Double) #-}
     {-# INLINE pi #-}
-    pi = toMatrix $ piJSVec (n*n)
+    pi = coerce $ piJSVec (n*n)
         where n = dim (undefined :: Matrix n t)
     {-# INLINE exp #-}
-    exp = toMatrix . expJSVec . jsref
+    exp = coerce . expJSVec . coerce
     {-# INLINE log #-}
-    log = toMatrix . logJSVec . jsref
+    log = coerce . logJSVec . coerce
     {-# INLINE (**) #-}
-    a ** b = toMatrix $ powerJSVec (jsref a) (jsref b)
+    a ** b = coerce $ powerJSVec (coerce a) (coerce b)
     {-# INLINE sqrt #-}
-    sqrt = toMatrix . sqrtJSVec . jsref
+    sqrt = coerce . sqrtJSVec . coerce
     {-# INLINE sin #-}
-    sin = toMatrix . sinJSVec . jsref
+    sin = coerce . sinJSVec . coerce
     {-# INLINE cos #-}
-    cos = toMatrix . cosJSVec . jsref
+    cos = coerce . cosJSVec . coerce
     {-# INLINE tan #-}
-    tan = toMatrix . tanJSVec . jsref
+    tan = coerce . tanJSVec . coerce
     {-# INLINE asin #-}
-    asin = toMatrix . asinJSVec . jsref
+    asin = coerce . asinJSVec . coerce
     {-# INLINE acos #-}
-    acos = toMatrix . acosJSVec . jsref
+    acos = coerce . acosJSVec . coerce
     {-# INLINE atan #-}
-    atan = toMatrix . atanJSVec . jsref
+    atan = coerce . atanJSVec . coerce
     {-# INLINE sinh #-}
-    sinh = toMatrix . sinhJSVec . jsref
+    sinh = coerce . sinhJSVec . coerce
     {-# INLINE cosh #-}
-    cosh = toMatrix . coshJSVec . jsref
+    cosh = coerce . coshJSVec . coerce
     {-# INLINE tanh #-}
-    tanh = toMatrix . tanhJSVec . jsref
+    tanh = coerce . tanhJSVec . coerce
     {-# INLINE asinh #-}
-    asinh = toMatrix . asinhJSVec . jsref
+    asinh = coerce . asinhJSVec . coerce
     {-# INLINE acosh #-}
-    acosh = toMatrix . acoshJSVec . jsref
+    acosh = coerce . acoshJSVec . coerce
     {-# INLINE atanh #-}
-    atanh = toMatrix . atanhJSVec . jsref
+    atanh = coerce . atanhJSVec . coerce

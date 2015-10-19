@@ -28,11 +28,11 @@ import Data.Geometry.Instances.Num ()
 
 #if defined(ghcjs_HOST_OS)
 
+import Data.Coerce (coerce)
 import GHC.TypeLits (KnownNat)
 
 import Data.Geometry.Prim.JSNum
 
-import GHCJS.Types
 
 instance (KnownNat n, JSNum t, Fractional t) => Fractional (Vector n t) where
     {-# SPECIALIZE instance Fractional (Vector 4 Float) #-}
@@ -42,12 +42,12 @@ instance (KnownNat n, JSNum t, Fractional t) => Fractional (Vector n t) where
     {-# SPECIALIZE instance Fractional (Vector 2 Float) #-}
     {-# SPECIALIZE instance Fractional (Vector 2 Double) #-}
     {-# INLINE (/) #-}
-    a / b = toVector $ divideJSVec (jsref a) (jsref b)
+    a / b = coerce $ divideJSVec (coerce a) (coerce b)
     {-# INLINE recip #-}
-    recip a = toVector $ recipJSVec (jsref a)
+    recip a = coerce $ recipJSVec (coerce a)
     {-# INLINE fromRational #-}
     fromRational i = v
-        where v = toVector . broadcastJSVec (fromNum (fromRational i :: t)) $ dim v
+        where v = coerce . broadcastJSVec (fromNum (fromRational i :: t)) $ dim v
 
 instance (KnownNat n, JSNum t, Fractional t) => Fractional (Matrix n t) where
     {-# SPECIALIZE instance Fractional (Matrix 4 Float) #-}
@@ -57,12 +57,12 @@ instance (KnownNat n, JSNum t, Fractional t) => Fractional (Matrix n t) where
     {-# SPECIALIZE instance Fractional (Matrix 2 Float) #-}
     {-# SPECIALIZE instance Fractional (Matrix 2 Double) #-}
     {-# INLINE (/) #-}
-    a / b = toMatrix $ divideJSVec (jsref a) (jsref b)
+    a / b = coerce $ divideJSVec (coerce a) (coerce b)
     {-# INLINE recip #-}
-    recip a = toMatrix $ recipJSVec (jsref a)
+    recip a = coerce $ recipJSVec (coerce a)
     {-# INLINE fromRational #-}
     fromRational i = v
-        where v = toMatrix $ broadcastJSVec (fromNum (fromRational i :: t)) (n*n)
+        where v = coerce $ broadcastJSVec (fromNum (fromRational i :: t)) (n*n)
               n = dim v
 
 
