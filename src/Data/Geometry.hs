@@ -18,6 +18,7 @@ module Data.Geometry
 
 #if defined(ghcjs_HOST_OS)
 import Data.Geometry.Instances.FloatingJS as X ()
+import Data.Geometry.Instances.TypedArray as X ()
 #else
 import Data.Geometry.Instances.Floating3  as X ()
 import Data.Geometry.Instances.Floating4  as X ()

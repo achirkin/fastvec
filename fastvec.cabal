@@ -41,6 +41,7 @@ library
             Data.Geometry.Instances.Ord
             Data.Geometry.Instances.Show
             Data.Geometry.Instances.Storable
+            Data.Geometry.Instances.TypedArray
             Data.Geometry.Prim.JSNum
         ghc-options: -Wall -O2
 
@@ -89,6 +90,7 @@ executable TempTests
             Data.Geometry.Instances.Ord
             Data.Geometry.Instances.Show
             Data.Geometry.Instances.Storable
+            Data.Geometry.Instances.TypedArray
             Data.Geometry.Prim.JSNum
         ghc-options: -Wall -O2
 

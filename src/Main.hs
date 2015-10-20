@@ -1,4 +1,7 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE JavaScriptFFI, GHCForeignImportPrim #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Main
@@ -28,7 +31,20 @@ import Foreign.Ptr
 --import Unsafe.Coerce
 --import Data.Geometry.Prim.JSNum
 
+#if defined(ghcjs_HOST_OS)
+import JavaScript.TypedArray
+import JavaScript.TypedArray.IO
+import qualified Control.Monad.ST as ST
+import qualified JavaScript.TypedArray.ST as ST
+
+import qualified GHC.Exts as Exts
+import Unsafe.Coerce
+--import Data.JSString
+import GHCJS.Types
+#else
+#endif
 import Data.Geometry
+
 
 main :: IO ()
 main = do
@@ -74,9 +90,55 @@ main = do
     peekElemOff marr 2 >>= print
     peekElemOff marr 3 >>= print
     peekElemOff marr 4 >>= print
+#if defined(ghcjs_HOST_OS)
+    let barr = typedArray 5 :: TypedArray (Vector 6 Float)
+        arr = fromList [a,b,c,d]
+        sarr = fillNewTypedArray 3 d
+    printAny barr
+    printAnyVal sarr
+    printAnyVal arr
+    print (arr ! 2 == c)
+    print (elemSize barr)
+    print (elemSize arr)
+    print (elemSize sarr)
+    printAnyVal (fromArray arr :: TypedArray (Vector 2 Double))
+    printAnyVal (fromArray (fromList [1,2,3 :: Float]) :: TypedArray Double)
+    print $ (arrayView $ arrayBuffer barr) ! 2 - d
+    print $ (arrayView . arrayBuffer $ fillNewTypedArray 8 (4::Float)) ! 1 * d
+    barr2 <- thaw barr
+    setIndex 2 1 barr2
+    setList 1 [0.3,23,12.3262] barr2
+    let barr3 = ST.runST $ do
+            barr35 <- ST.unsafeThaw barr
+            ST.setIndex 0 2.34 barr35
+            ST.freeze barr35
+    print barr3
+    print barr
+    print barr2
+#else
+#endif
     where a = vector4 2 0 0 2 :: Vector 4 Float
           b = vector4 0 1 0 0 :: Vector 4 Float
           c = vector4 0 0 4 0 :: Vector 4 Float
           d = vector4 0 2 0 1
           m = matrix4x4 a b c d
           l = diag 6 :: Matrix 3 Float
+
+
+
+#if defined(ghcjs_HOST_OS)
+-- | Printing anything without conversion of types
+printAny :: a -> IO ()
+printAny = printAny' . unsafeCoerce
+
+foreign import javascript safe "console.log($1)"
+    printAny' :: Exts.Any -> IO ()
+
+-- | Printing anything without conversion of types, attempting to get value from the heap object
+printAnyVal :: a -> IO ()
+printAnyVal = printVal' . unsafeCoerce
+
+foreign import javascript safe "console.log($1)"
+    printVal' :: JSVal -> IO ()
+#else
+#endif

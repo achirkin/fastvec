@@ -637,3 +637,36 @@ function readElemOffJSVecUint32(buf, idx, n) {
     var tarr = buf.u3 || (buf.u3 = new Uint32Array(buf.buf));
     return Array.prototype.slice.call(tarr, idx, idx+n);
 }
+
+// ----------------- Typed Array ----------------------------------------------//
+
+function fillTypedArray(vec, n, arr) {
+    var m = vec.length;
+    for (var i = 0; i < n; i++)
+    {
+        arr.set(vec, i*m);
+    }
+    return arr;
+}
+
+function setVecArray(idx, vec, arr) {
+    arr.set(vec, idx*vec.length);
+    return arr;
+}
+
+
+function fillListArray(idx, vecl, arr) {
+    var vecs = h$listToArray(vecl);
+    var n = vecs.length;
+    if (n <= 0) {return arr;}
+    var m = vecs[0].length;
+    for (var i = 0; i < n; i++)
+    {
+        arr.set(vecs[i], (idx+i)*m);
+    }
+    return arr;
+}
+
+function indexVecArray(arr, i, n) {
+    return Array.prototype.slice.call(arr, i*n, (i+1)*n);
+}
