@@ -10,7 +10,6 @@
 --
 -- Maintainer  :  Artem M. Chirkin <chirkin@arch.ethz.ch>
 -- Stability   :  Experimental
--- Portability :
 --
 --
 -----------------------------------------------------------------------------

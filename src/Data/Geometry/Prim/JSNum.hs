@@ -1,6 +1,6 @@
 {-# LANGUAGE JavaScriptFFI, GHCForeignImportPrim #-}
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE MagicHash, UnboxedTuples #-}
+{-# LANGUAGE MagicHash, UnboxedTuples, PolyKinds #-}
 {-# LANGUAGE UnliftedFFITypes #-}
 -----------------------------------------------------------------------------
 -- |
@@ -17,6 +17,10 @@
 
 module Data.Geometry.Prim.JSNum
     where
+
+import GHC.Exts as Exts
+
+import JavaScript.TypedArray
 
 import GHCJS.Prim
 import GHCJS.Types
@@ -402,9 +406,26 @@ foreign import javascript unsafe "readElemOffJSVecUint32($1,$2,$3)"
     readElemOffJSVecUint32 :: Ref# -> Int -> Int -> JSVal
 
 
+-- TypedArrays
 
-foreign import javascript unsafe "console.log($1)"
-    printRef :: JSVal -> IO ()
+{-# INLINE js_fillJSArray #-}
+foreign import javascript unsafe "fillTypedArray($1,$2,$3)"
+    js_fillJSArray :: JSVal -> Int -> SomeTypedArray any t -> SomeTypedArray any t
+
+{-# INLINE js_setVecArray #-}
+foreign import javascript unsafe "setVecArray($1,$2,$3)"
+    js_setVecArray :: Int -> JSVal -> SomeTypedArray any t -> SomeTypedArray any t
+
+{-# INLINE js_fillListJSArray #-}
+foreign import javascript unsafe "fillListArray($1,$2,$3)"
+    js_fillListJSArray :: Int -> Exts.Any -> SomeTypedArray any t -> SomeTypedArray any t
+
+{-# INLINE js_indexVecArray #-}
+foreign import javascript unsafe "indexVecArray($1,$2,$3)"
+    js_indexVecArray :: SomeTypedArray any t -> Int -> Int -> JSVal
+
+--foreign import javascript unsafe "console.log($1)"
+--    printRef :: JSVal -> IO ()
 
 
 
