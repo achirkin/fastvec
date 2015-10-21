@@ -42,8 +42,13 @@ library
             Data.Geometry.Instances.Show
             Data.Geometry.Instances.Storable
             Data.Geometry.Instances.TypedArray
+            Data.Geometry.Instances.Enum
+            Data.Geometry.Instances.Integral
+            Data.Geometry.Instances.Real
+            Data.Geometry.Instances.RealFrac
+            Data.Geometry.Instances.RealFloat
             Data.Geometry.Prim.JSNum
-        ghc-options: -Wall -O2
+        ghc-options: -Wall -O2 -fenable-rewrite-rules
 
     if !impl(ghcjs -any)
         build-depends:
@@ -62,7 +67,7 @@ library
             Data.Geometry.Prim.FloatX3
             Data.Geometry.Prim.FloatX4
             Data.Geometry.Prim.Int32X4
-        ghc-options: -Wall -fllvm -O2 -mavx2
+        ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
     exposed-modules:
         Data.Geometry
         Data.Geometry.VectorMath
@@ -92,7 +97,7 @@ executable TempTests
             Data.Geometry.Instances.Storable
             Data.Geometry.Instances.TypedArray
             Data.Geometry.Prim.JSNum
-        ghc-options: -Wall -O2
+        ghc-options: -Wall -O2 -fenable-rewrite-rules
 
     if !impl(ghcjs -any)
         build-depends:
@@ -113,7 +118,7 @@ executable TempTests
             Data.Geometry.Prim.FloatX3
             Data.Geometry.Prim.FloatX4
             Data.Geometry.Prim.Int32X4
-        ghc-options: -Wall -fllvm -O2 -mavx2
+        ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
     main-is: Main.hs
     js-sources:
         prims/JSNumberOps.js
@@ -131,7 +136,7 @@ test-suite VectorTests
             VectorTests.VectorGenerators
             VectorTests.TH
             VectorTests.TestNum
-        ghc-options: -Wall -fllvm -O2
+        ghc-options: -Wall -fllvm -O2 -fenable-rewrite-rules
     type: exitcode-stdio-1.0
     main-is: VectorTests.hs
     build-depends:

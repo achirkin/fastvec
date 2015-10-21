@@ -31,6 +31,20 @@ import GHC.TypeLits (KnownNat)
 
 import Data.Geometry.Prim.JSNum
 
+{-# INLINE [2] resizeVector #-}
+resizeVector :: (KnownNat n, KnownNat m) => Vector n t -> Vector m t
+resizeVector v = r
+    where r = coerce $ resizeJSVec (coerce v) (dim r)
+
+{-# RULES "resizeVector/id" forall (m :: Vector n t) . resizeVector m = m :: Vector n t #-}
+
+{-# INLINE [2] resizeMatrix #-}
+resizeMatrix :: (KnownNat n, KnownNat m) => Matrix n t -> Matrix m t
+resizeMatrix m = r
+    where r = coerce $ resizeJSMat (coerce m) (dim m) (dim r)
+
+{-# RULES "resizeMatrix/id" forall (m :: Matrix n t) . resizeMatrix m = m :: Matrix n t #-}
+
 instance (KnownNat n, JSNum a) => VectorMath n a where
     {-# SPECIALIZE instance VectorMath 4 Int #-}
     {-# SPECIALIZE instance VectorMath 4 Float #-}
@@ -53,6 +67,10 @@ instance (KnownNat n, JSNum a) => VectorMath n a where
     a .*. b = coerce $ dotBJSVec (coerce a) (coerce b)
     {-# INLINE dot #-}
     dot a b = toNum $ dotJSVec (coerce a) (coerce b)
+    {-# INLINE indexVector #-}
+    indexVector i v = toNum $ indexJSVec i (coerce v)
+    {-# INLINE indexMatrix #-}
+    indexMatrix i j m = toNum $ indexJSVec (i + j * dim m) (coerce m)
 
 
 instance JSNum a => Vector4Math a where
@@ -63,6 +81,15 @@ instance JSNum a => Vector4Math a where
     vector4 a b c d = coerce $ jsVector4 (fromNum a) (fromNum b) (fromNum c) (fromNum d)
     {-# INLINE matrix4x4 #-}
     matrix4x4 a b c d = coerce $ jsMatrix4 (coerce a) (coerce b) (coerce c) (coerce d)
+    {-# INLINE unpackV4 #-}
+    unpackV4 v = case unpackJSVec4 (coerce v) of
+        (# a, b, c, d #) -> ( toNum a, toNum b, toNum c, toNum d )
+    {-# INLINE colsOfM4 #-}
+    colsOfM4 m = case unpackJSVec4 $ matColsJS (coerce m) 4 of
+        (# a, b, c, d #) -> ( coerce a, coerce b, coerce c, coerce d )
+    {-# INLINE rowsOfM4 #-}
+    rowsOfM4 m = case unpackJSVec4 $ matRowsJS (coerce m) 4 of
+        (# a, b, c, d #) -> ( coerce a, coerce b, coerce c, coerce d )
 
 instance JSNum a => Vector3Math a where
     {-# SPECIALIZE instance Vector3Math Int #-}
@@ -72,6 +99,15 @@ instance JSNum a => Vector3Math a where
     vector3 a b c = coerce $ jsVector3 (fromNum a) (fromNum b) (fromNum c)
     {-# INLINE matrix3x3 #-}
     matrix3x3 a b c = coerce $ jsMatrix3 (coerce a) (coerce b) (coerce c)
+    {-# INLINE unpackV3 #-}
+    unpackV3 v = case unpackJSVec3 (coerce v) of
+        (# a, b, c #) -> ( toNum a, toNum b, toNum c )
+    {-# INLINE colsOfM3 #-}
+    colsOfM3 m = case unpackJSVec3 $ matColsJS (coerce m) 3 of
+        (# a, b, c #) -> ( coerce a, coerce b, coerce c )
+    {-# INLINE rowsOfM3 #-}
+    rowsOfM3 m = case unpackJSVec3 $ matRowsJS (coerce m) 3 of
+        (# a, b, c #) -> ( coerce a, coerce b, coerce c )
 
 instance JSNum a => Vector2Math a where
     {-# SPECIALIZE instance Vector2Math Int #-}
@@ -81,6 +117,15 @@ instance JSNum a => Vector2Math a where
     vector2 a b = coerce $ jsVector2 (fromNum a) (fromNum b)
     {-# INLINE matrix2x2 #-}
     matrix2x2 a b = coerce $ jsMatrix2 (coerce a) (coerce b)
+    {-# INLINE unpackV2 #-}
+    unpackV2 v = case unpackJSVec2 (coerce v) of
+        (# a, b #) -> ( toNum a, toNum b )
+    {-# INLINE colsOfM2 #-}
+    colsOfM2 m = case unpackJSVec2 $ matColsJS (coerce m) 2 of
+        (# a, b #) -> ( coerce a, coerce b )
+    {-# INLINE rowsOfM2 #-}
+    rowsOfM2 m = case unpackJSVec2 $ matRowsJS (coerce m) 2 of
+        (# a, b #) -> ( coerce a, coerce b )
 
 instance (JSNum a, KnownNat n) => MatrixProduct Matrix n a where
     prod a b = coerce $ prodJSMM (coerce a) (coerce b) (dim b)

@@ -134,10 +134,28 @@ function dotBJSVec(lhs,rhs) {
     return lhs.map(function (){ return rez; });
 }
 
+function matColsJS(mat, n) {
+    var rez = new Array(n);
+    for(var i = 0; i < n; i++) {
+        rez[i] = mat.slice(i*n,(i+1)*n);
+    }
+    return rez;
+}
+
+function matRowsJS(mat, n) {
+    var rez = new Array(n);
+    for(var i = 0; i < n; i++) {
+        rez[i] = new Array(n);
+        for(var j = 0; j < n; j++) {
+            rez[i][j] = mat[i+j*n];
+        }
+    }
+    return rez;
+}
 // ----------------- MatrixProduct ----------------------------------------------//
 
 function prodJSMM(lhs,rhs,n) {
-    var rez = new Array(n);
+    var rez = new Array(n*n);
     for(var i = 0; i < n; i++) {
         for(var j = 0; j < n; j++) {
             rez[i*n+j] = 0;
@@ -669,4 +687,46 @@ function fillListArray(idx, vecl, arr) {
 
 function indexVecArray(arr, i, n) {
     return Array.prototype.slice.call(arr, i*n, (i+1)*n);
+}
+
+
+// ----------------- Resizing ----------------------------------------------//
+
+function resizeJSVec(vec, n2) {
+    var n1 = vec.length;
+    if (n1 >= n2) { return vec.slice(0,n2);}
+    else {return vec.concat(Array.apply(null, Array(n2-n1)).map(Number.prototype.valueOf,0) );}
+}
+
+function resizeJSMat(mat, n1, n2) {
+    if (n1 == n2) { return mat.slice(); }
+    if (n1 > n2) {
+        var rez = [];
+        for(var i = 0; i < n2; i++) {
+            rez = rez.concat(mat.slice(i*n1,i*n1+n2));
+        }
+    } else {
+        var dif = Array.apply(null, Array(n2-n1)).map(Number.prototype.valueOf,0);
+        var rez = [];
+        for(var i = 0; i < n1; i++) {
+            rez = rez.concat(mat.slice(i*n1,(i+1)*n1),dif);
+        }
+        rez = rez.concat(Array.apply(null, Array(n2*(n2-n1))).map(Number.prototype.valueOf,0));
+    }
+    return rez;
+}
+
+
+// ----------------- Integral ----------------------------------------------//
+
+function gcdVec(lhs,rhs){
+    var gcdf = function (a, b) { if (b == 0) {return a;} else {return gcdf(b, a - (a / b | 0)*b);} }
+    return lhs.map(function (e, i) { return gcdf(Math.abs(e),Math.abs(rhs[i]));})
+}
+
+
+function lcmVec(lhs,rhs){
+    var gcdf = function (a, b) { if (b == 0) {return a;} else {return gcdf(b, a - (a / b | 0)*b);} }
+    var lcmf = function (a, b) { if (b == 0 || a == 0) {return 0;} else {return a * b / gcdf(a,b);} }
+    return lhs.map(function (e, i) { return lcmf(Math.abs(e),Math.abs(rhs[i]));})
 }

@@ -96,6 +96,10 @@ class VectorMath (n :: Nat) t where
     (.*.) :: Vector n t -> Vector n t -> Vector n t
     -- | Scalar product -- sum of vectors' components products -- a scalar
     dot :: Vector n t -> Vector n t -> t
+    -- | Get element by its index
+    indexVector :: Int -> Vector n t -> t
+    -- | Get element by its index
+    indexMatrix :: Int -> Int -> Matrix n t -> t
 
 class VectorMath n t => VectorFracMath n t where
     inverse :: Matrix n t -> Matrix n t
@@ -104,14 +108,24 @@ class VectorMath n t => VectorFracMath n t where
 class Vector4Math t where
     vector4 :: t -> t -> t -> t -> Vector 4 t
     matrix4x4 :: Vector 4 t -> Vector 4 t -> Vector 4 t -> Vector 4 t -> Matrix 4 t
+    unpackV4 :: Vector 4 t -> (t,t,t,t)
+    rowsOfM4 :: Matrix 4 t -> (Vector 4 t,Vector 4 t,Vector 4 t,Vector 4 t)
+    colsOfM4 :: Matrix 4 t -> (Vector 4 t,Vector 4 t,Vector 4 t,Vector 4 t)
 
 class Vector3Math t where
     vector3 :: t -> t -> t -> Vector 3 t
     matrix3x3 :: Vector 3 t -> Vector 3 t -> Vector 3 t -> Matrix 3 t
+    unpackV3 :: Vector 3 t -> (t,t,t)
+    rowsOfM3 :: Matrix 3 t -> (Vector 3 t,Vector 3 t,Vector 3 t)
+    colsOfM3 :: Matrix 3 t -> (Vector 3 t,Vector 3 t,Vector 3 t)
+
 
 class Vector2Math t where
     vector2 :: t -> t -> Vector 2 t
     matrix2x2 :: Vector 2 t -> Vector 2 t -> Matrix 2 t
+    unpackV2 :: Vector 2 t -> (t,t)
+    rowsOfM2 :: Matrix 2 t -> (Vector 2 t,Vector 2 t)
+    colsOfM2 :: Matrix 2 t -> (Vector 2 t,Vector 2 t)
 
 class VectorMath n t => MatrixProduct a n t where
     prod :: Matrix n t -> a n t -> a n t
