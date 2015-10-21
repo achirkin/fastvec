@@ -36,6 +36,7 @@ import JavaScript.TypedArray
 import JavaScript.TypedArray.IO
 import qualified Control.Monad.ST as ST
 import qualified JavaScript.TypedArray.ST as ST
+import Data.Int
 
 import qualified GHC.Exts as Exts
 import Unsafe.Coerce
@@ -115,12 +116,49 @@ main = do
     print barr3
     print barr
     print barr2
+    putStrLn "Decomposing matrices"
+    print m
+    print $ colsOfM4 m
+    print $ rowsOfM4 m
+    putStrLn "Enum tests"
+    print ([vector2 0 3, 3.1 .. 9] :: [Vector 2 Double])
+    putStrLn "Resizing"
+    print (resizeMatrix m :: Matrix 2 Float)
+    print (resizeMatrix m :: Matrix 7 Float)
+    print (resizeMatrix m :: Matrix 4 Float)
+    print (resizeVector e :: Vector 2 Double)
+    print (resizeVector e :: Vector 7 Double)
+    print (resizeVector e :: Vector 5 Double)
+    putStrLn "Real tests"
+    print (realToFrac e :: Vector 3 Float)
+    print (realToFrac e :: Vector 4 Float)
+    print (realToFrac e :: Vector 5 Double)
+    print (realToFrac d :: Vector 6 Double)
+    print (realToFrac e :: Vector 2 Double)
+    putStrLn "Integral tests"
+    print (fromIntegral iv1 * e)
+    print (fromIntegral iv2 * vector2 1 (2::Double))
+    print (iv1 `div` iv2)
+    putStrLn "lcm+gcd"
+    print (lcm iv1 iv2)
+    print (gcd iv1 iv2)
+    putStrLn "integral power"
+    print (iv2 ^ vector3 0 1 (2::Int))
+    putStrLn "RealFrac tests"
+    print e
+    print (round e :: Vector 2 Int)
+    print (floor e :: Vector 3 Int16)
+    print (truncate e :: Vector 6 Int)
+    print (ceiling e :: Vector 5 Int)
 #else
 #endif
     where a = vector4 2 0 0 2 :: Vector 4 Float
           b = vector4 0 1 0 0 :: Vector 4 Float
           c = vector4 0 0 4 0 :: Vector 4 Float
           d = vector4 0 2 0 1
+          e = vector4 1 (-2.0124) 9.72 0.23
+          iv1 = vector3 113 63 (-135) :: Vector3 Int
+          iv2 = vector3 7 (-36) 15 :: Vector3 Int
           m = matrix4x4 a b c d
           l = diag 6 :: Matrix 3 Float
 

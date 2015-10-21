@@ -108,6 +108,39 @@ foreign import javascript unsafe "$r = dotJSVec($1,$2)"
 foreign import javascript unsafe "$r = dotBJSVec($1,$2)"
     dotBJSVec :: JSVal -> JSVal -> JSVal
 
+
+{-# INLINE indexJSVec #-}
+foreign import javascript unsafe "$r = $2[$1]"
+    indexJSVec :: Int -> JSVal -> JSVal
+
+{-# INLINE unpackJSVec4 #-}
+foreign import javascript unsafe "$r1 = $1[0]; $r2 = $1[1]; $r3 = $1[2]; $r4 = $1[3];"
+    unpackJSVec4 :: JSVal -> (# JSVal,JSVal,JSVal,JSVal #)
+
+{-# INLINE unpackJSVec3 #-}
+foreign import javascript unsafe "$r1 = $1[0]; $r2 = $1[1]; $r3 = $1[2];"
+    unpackJSVec3 :: JSVal -> (# JSVal,JSVal,JSVal #)
+
+{-# INLINE unpackJSVec2 #-}
+foreign import javascript unsafe "$r1 = $1[0]; $r2 = $1[1];"
+    unpackJSVec2 :: JSVal -> (# JSVal,JSVal #)
+
+{-# INLINE matColsJS #-}
+foreign import javascript unsafe "$r = matColsJS($1,$2)"
+    matColsJS :: JSVal -> Int -> JSVal
+
+{-# INLINE matRowsJS #-}
+foreign import javascript unsafe "$r = matRowsJS($1,$2)"
+    matRowsJS :: JSVal -> Int -> JSVal
+
+{-# INLINE resizeJSVec #-}
+foreign import javascript unsafe "$r = resizeJSVec($1,$2)"
+    resizeJSVec :: JSVal -> Int -> JSVal
+
+{-# INLINE resizeJSMat #-}
+foreign import javascript unsafe "$r = resizeJSMat($1,$2,$3)"
+    resizeJSMat :: JSVal -> Int -> Int -> JSVal
+
 -- MatrixProduct
 
 {-# INLINE prodJSMM #-}
@@ -427,6 +460,63 @@ foreign import javascript unsafe "indexVecArray($1,$2,$3)"
 --foreign import javascript unsafe "console.log($1)"
 --    printRef :: JSVal -> IO ()
 
+-- Integral
+
+{-# INLINE js_quot #-}
+foreign import javascript unsafe "$r = $1.map(function (e, i) { return (e / $2[i] | 0);})"
+    js_quot :: JSVal -> JSVal -> JSVal
+
+{-# INLINE js_rem #-}
+foreign import javascript unsafe "$r = $1.map(function (e, i) { return e - (e / $2[i] | 0)*$2[i];})"
+    js_rem :: JSVal -> JSVal -> JSVal
+
+{-# INLINE js_quotRem #-}
+foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e, i) { var x = e / $2[i] | 0; $r1.push(x); $r2.push(e - x*$2[i]);})"
+    js_quotRem :: JSVal -> JSVal -> (JSVal, JSVal)
+
+{-# INLINE js_div #-}
+foreign import javascript unsafe "$r = $1.map(function (e, i) { return Math.floor(e / $2[i]);})"
+    js_div :: JSVal -> JSVal -> JSVal
+
+{-# INLINE js_mod #-}
+foreign import javascript unsafe "$r = $1.map(function (e, i) { return e - Math.floor(e / $2[i])*$2[i];})"
+    js_mod :: JSVal -> JSVal -> JSVal
+
+{-# INLINE js_divMod #-}
+foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e, i) { var x = Math.floor(e / $2[i]); $r1.push(x); $r2.push(e - x*$2[i]);})"
+    js_divMod :: JSVal -> JSVal -> (JSVal, JSVal)
+
+{-# INLINE js_gcdVec #-}
+foreign import javascript unsafe "$r = gcdVec($1,$2)"
+    js_gcdVec :: JSVal -> JSVal -> JSVal
+
+{-# INLINE js_lcmVec #-}
+foreign import javascript unsafe "$r = lcmVec($1,$2)"
+    js_lcmVec :: JSVal -> JSVal -> JSVal
+
+
+-- RealFrac
+
+{-# INLINE js_truncate #-}
+foreign import javascript unsafe "$1.map(Math.trunc)"
+    js_truncate :: JSVal -> JSVal
+
+
+{-# INLINE js_round #-}
+foreign import javascript unsafe "$1.map(Math.round)"
+    js_round :: JSVal -> JSVal
+
+{-# INLINE js_ceiling #-}
+foreign import javascript unsafe "$1.map(Math.ceil)"
+    js_ceiling :: JSVal -> JSVal
+
+{-# INLINE js_floor #-}
+foreign import javascript unsafe "$1.map(Math.floor)"
+    js_floor :: JSVal -> JSVal
+
+{-# INLINE js_properFraction #-}
+foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e) { var x = e | 0; $r1.push(x); $r2.push(e - x);})"
+    js_properFraction :: JSVal -> (JSVal, JSVal)
 
 
 foreign import javascript unsafe "$r = [$1,$2]"
