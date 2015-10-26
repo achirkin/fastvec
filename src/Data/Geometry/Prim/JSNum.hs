@@ -72,6 +72,25 @@ JSNUM(CDouble)
 
 -- VectorMath
 
+
+{-# INLINE js_normLPInf #-}
+foreign import javascript unsafe "normLPInf($1)"
+    js_normLPInf :: JSVal -> JSVal
+{-# INLINE js_normLNInf #-}
+foreign import javascript unsafe "normLNInf($1)"
+    js_normLNInf :: JSVal -> JSVal
+{-# INLINE js_normLP #-}
+foreign import javascript unsafe "normLP($2,$1)"
+    js_normLP :: Int -> JSVal -> JSVal
+{-# INLINE js_normL1 #-}
+foreign import javascript unsafe "normL1($1)"
+    js_normL1 :: JSVal -> JSVal
+{-# INLINE js_normL2 #-}
+foreign import javascript unsafe "normL2($1)"
+    js_normL2 :: JSVal -> JSVal
+
+
+
 {-# INLINE eyeJSMat #-}
 foreign import javascript unsafe "$r = eyeJSMat($1)"
     eyeJSMat :: Int -> JSVal
@@ -518,6 +537,15 @@ foreign import javascript unsafe "$1.map(Math.floor)"
 foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e) { var x = e | 0; $r1.push(x); $r2.push(e - x);})"
     js_properFraction :: JSVal -> (JSVal, JSVal)
 
+-- Misc ops
+
+{-# INLINE js_cross #-}
+foreign import javascript unsafe "[$1[1]*$2[2]-$1[2]*$2[1],$1[2]*$2[0]-$1[0]*$2[2],$1[0]*$2[1]-$1[1]*$2[0]]"
+    js_cross :: JSVal -> JSVal -> JSVal
+
+{-# INLINE js_det2 #-}
+foreign import javascript unsafe "$1[0]*$2[1]-$1[1]*$2[0]"
+    js_det2 :: JSVal -> JSVal -> JSVal
 
 foreign import javascript unsafe "$r = [$1,$2]"
     jsVector2 :: JSVal -> JSVal -> JSVal

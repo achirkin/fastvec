@@ -8,6 +8,39 @@ function broadcastJSVec(value,n) {
 
 // ----------------- VectorMath ----------------------------------------------//
 
+Math.hypot = Math.hypot || function() {
+  var y = 0;
+  var length = arguments.length;
+
+  for (var i = 0; i < length; i++) {
+    if (arguments[i] === Infinity || arguments[i] === -Infinity) {
+      return Infinity;
+    }
+    y += arguments[i] * arguments[i];
+  }
+  return Math.sqrt(y);
+};
+
+function normLPInf(vec){
+    return Math.max.apply(null,vec.map(Math.abs));
+}
+function normLNInf(vec){
+    return Math.min.apply(null,vec.map(Math.abs));
+}
+function normLP(vec,p){
+    return Math.pow(vec.reduce(function (r, e) {
+        return r + Math.pow(Math.abs(e),p);
+    }, 0), 1/p);
+}
+function normL2(vec){
+    return Math.hypot.apply(null,vec);
+}
+function normL1(vec){
+    return vec.reduce(function (r, e) {
+        return r + Math.abs(e);
+    }, 0);
+}
+
 function eyeJSMat(n) {
     var mat = Array.apply(null, Array(n*n)).map(Number.prototype.valueOf,0);
     for(var i = 0; i < n*n; i += n + 1){mat[i]=1;}
@@ -158,9 +191,9 @@ function prodJSMM(lhs,rhs,n) {
     var rez = new Array(n*n);
     for(var i = 0; i < n; i++) {
         for(var j = 0; j < n; j++) {
-            rez[i*n+j] = 0;
+            rez[i+j*n] = 0;
             for(var k = 0; k < n; k++) {
-                rez[i*n+j] += lhs[i*n+k]*rhs[k*n+j];
+                rez[i+j*n] += lhs[i+k*n]*rhs[k+j*n];
             }
         }
     }
@@ -168,11 +201,12 @@ function prodJSMM(lhs,rhs,n) {
 }
 
 function prodJSMV(lhs,rhs) {
-    var rez = rhs.length;
+    var n = rhs.length;
+    var rez = new Array(n);
     for(var i = 0; i < n; i++) {
         rez[i] = 0;
         for(var j = 0; j < n; j++) {
-            rez[i] += lhs[i*n+j]*rhs[j];
+            rez[i] += lhs[i+j*n]*rhs[j];
         }
     }
     return rez;
@@ -200,7 +234,7 @@ function inverseJSM4(mat) {
     rez[7]  = mat[ 8]*(mat[ 2]*mat[ 7]-mat[ 6]*mat[ 3])+mat[ 4]*(mat[10]*mat[ 3]-mat[ 2]*mat[11])+mat[ 0]*(mat[ 6]*mat[11]-mat[10]*mat[ 7]);
     rez[11] = mat[ 8]*(mat[ 5]*mat[ 3]-mat[ 1]*mat[ 7])+mat[ 4]*(mat[ 1]*mat[11]-mat[ 9]*mat[ 3])+mat[ 0]*(mat[ 9]*mat[ 7]-mat[ 5]*mat[11]);
     rez[15] = mat[ 8]*(mat[ 1]*mat[ 6]-mat[ 5]*mat[ 2])+mat[ 4]*(mat[ 9]*mat[ 2]-mat[ 1]*mat[10])+mat[ 0]*(mat[ 5]*mat[10]-mat[ 9]*mat[ 6]);
-    var det = mat[ 0]*rez[ 0] + mat[ 4]*rez[ 4] + mat[ 8]*rez[ 8] + mat[12]*rez[12];
+    var det = mat[ 0]*rez[ 0] + mat[ 1]*rez[ 4] + mat[ 2]*rez[ 8] + mat[3]*rez[12];
     if (det === 0) {
         return undefined;
     } else {
@@ -220,7 +254,7 @@ function inverseJSM3(mat) {
     rez[2] = mat[1]*mat[5] - mat[4]*mat[2];
     rez[5] = mat[3]*mat[2] - mat[0]*mat[5];
     rez[8] = mat[0]*mat[4] - mat[3]*mat[1];
-    var det = mat[0]*rez[0] + mat[3]*rez[3] + mat[6]*rez[6];
+    var det = mat[0]*rez[0] + mat[1]*rez[3] + mat[2]*rez[6];
     if (det === 0) {
         return undefined;
     } else {
