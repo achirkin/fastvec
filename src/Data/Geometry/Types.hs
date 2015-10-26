@@ -3,7 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE CPP #-}
 #if defined(ghcjs_HOST_OS)
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 #else
 #endif
@@ -27,28 +27,54 @@ import Data.Geometry.VectorMath
 #if defined(ghcjs_HOST_OS)
 
 import Data.Coerce (coerce)
-import GHC.TypeLits (KnownNat)
+import GHC.TypeLits
 
 import Data.Geometry.Prim.JSNum
+
+
+
+{-# INLINE fromHom #-}
+foreign import javascript unsafe "var l = $1[$1.length-1]; if(l !== 0){$r = $1.map(function(e){return e/l;});}else{$r = Array.from($1);} $r.pop();"
+    fromHom :: Vector (n+1) t -> Vector n t
+
+
+{-# INLINE unit #-}
+foreign import javascript unsafe "var l = Math.hypot.apply(null,$1); $r = $1.map(function(e){return e/l;});"
+    unit :: Vector n t -> Vector n t
+
+-- | Cross-product of two 3D vectors
+{-# INLINE cross #-}
+cross :: Vector 3 t -> Vector 3 t -> Vector 3 t
+cross a b = coerce $ js_cross (coerce a) (coerce b)
+
+-- | Determinant of a matrix composed of two 2D vectors
+{-# INLINE det2 #-}
+det2 :: JSNum t => Vector 2 t -> Vector 2 t -> t
+det2 a b = toNum $ js_cross (coerce a) (coerce b)
 
 {-# INLINE [2] resizeVector #-}
 resizeVector :: (KnownNat n, KnownNat m) => Vector n t -> Vector m t
 resizeVector v = r
     where r = coerce $ resizeJSVec (coerce v) (dim r)
 
-{-# RULES "resizeVector/id" forall (m :: Vector n t) . resizeVector m = m :: Vector n t #-}
+{-# RULES "resizeVector/id" resizeVector = id :: Vector n t -> Vector n t #-}
 
 {-# INLINE [2] resizeMatrix #-}
 resizeMatrix :: (KnownNat n, KnownNat m) => Matrix n t -> Matrix m t
 resizeMatrix m = r
     where r = coerce $ resizeJSMat (coerce m) (dim m) (dim r)
 
-{-# RULES "resizeMatrix/id" forall (m :: Matrix n t) . resizeMatrix m = m :: Matrix n t #-}
+{-# RULES "resizeMatrix/id" resizeMatrix = id :: Matrix n t -> Matrix n t #-}
 
 instance (KnownNat n, JSNum a) => VectorMath n a where
     {-# SPECIALIZE instance VectorMath 4 Int #-}
     {-# SPECIALIZE instance VectorMath 4 Float #-}
     {-# SPECIALIZE instance VectorMath 4 Double #-}
+    {-# INLINE broadcastVector #-}
+    broadcastVector a = coerce $ broadcastJSVec (fromNum a) (dim (undefined :: Vector n a))
+    {-# INLINE broadcastMatrix #-}
+    broadcastMatrix a = coerce $ broadcastJSVec (fromNum a) (n*n)
+        where n = dim (undefined :: Vector n a)
     {-# INLINE eye #-}
     eye = coerce . eyeJSMat $ dim (undefined :: Matrix n a)
     {-# INLINE diag #-}
@@ -71,6 +97,16 @@ instance (KnownNat n, JSNum a) => VectorMath n a where
     indexVector i v = toNum $ indexJSVec i (coerce v)
     {-# INLINE indexMatrix #-}
     indexMatrix i j m = toNum $ indexJSVec (i + j * dim m) (coerce m)
+    {-# INLINE normL1 #-}
+    normL1 = toNum . js_normL1 . coerce
+    {-# INLINE normL2 #-}
+    normL2 = toNum . js_normL2 . coerce
+    {-# INLINE normLPInf #-}
+    normLPInf = toNum . js_normLPInf . coerce
+    {-# INLINE normLNInf #-}
+    normLNInf = toNum . js_normLNInf . coerce
+    {-# INLINE normLP #-}
+    normLP p = toNum . js_normLP p . coerce
 
 
 instance JSNum a => Vector4Math a where

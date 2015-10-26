@@ -150,6 +150,8 @@ main = do
     print (floor e :: Vector 3 Int16)
     print (truncate e :: Vector 6 Int)
     print (ceiling e :: Vector 5 Int)
+    print (4.3 :: QFloat)
+    print (7.6 :: QDouble)
 #else
 #endif
     where a = vector4 2 0 0 2 :: Vector 4 Float

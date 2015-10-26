@@ -32,6 +32,7 @@ import Data.Geometry.Prim.JSNum
 import Data.Geometry.VectorMath
 
 
+
 instance ( ImmutableArrayBufferPrim (TypedArray t)
          ) => ImmutableArrayBufferPrim (TypedArray (Vector n t)) where
     {-# INLINE fromByteArrayPrim #-}

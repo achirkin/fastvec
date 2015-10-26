@@ -13,8 +13,6 @@
 
 module Data.Geometry
     ( module X
-    , Vector2, Vector3, Vector4
-    , Matrix2, Matrix3, Matrix4
     ) where
 
 
@@ -26,6 +24,7 @@ import Data.Geometry.Instances.Integral   as X ()
 import Data.Geometry.Instances.Real       as X ()
 import Data.Geometry.Instances.RealFrac   as X ()
 import Data.Geometry.Instances.RealFloat  as X ()
+import Data.Geometry.Quaternion           as X
 #else
 import Data.Geometry.Instances.Floating3  as X ()
 import Data.Geometry.Instances.Floating4  as X ()
@@ -41,10 +40,5 @@ import Data.Geometry.Instances.Storable   as X ()
 
 
 
-type Vector2 = Vector 2
-type Vector3 = Vector 3
-type Vector4 = Vector 4
-type Matrix2 = Matrix 2
-type Matrix3 = Matrix 3
-type Matrix4 = Matrix 4
+
 

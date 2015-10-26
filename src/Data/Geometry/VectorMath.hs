@@ -31,6 +31,8 @@ module Data.Geometry.VectorMath
     , Vector (..), Matrix (..)
     , Dimensional (..)
 #endif
+    , Vector2, Vector3, Vector4
+    , Matrix2, Matrix3, Matrix4
     ) where
 
 import GHC.TypeLits
@@ -77,6 +79,10 @@ class VectorMath (n :: Nat) t where
     data Vector (n :: Nat) t
     data Matrix (n :: Nat) t
 #endif
+    -- | Fill vector with the same value
+    broadcastVector :: t -> Vector n t
+    -- | Fill matrix with single value
+    broadcastMatrix :: t -> Matrix n t
     -- | Matrix with 1 on diagonal and 0 elsewhere
     eye :: Matrix n t
     -- | Put the same value on the matrix diagonal, 0 otherwise
@@ -100,6 +106,21 @@ class VectorMath (n :: Nat) t where
     indexVector :: Int -> Vector n t -> t
     -- | Get element by its index
     indexMatrix :: Int -> Int -> Matrix n t -> t
+    -- | Sum of absolute values
+    normL1 :: Vector n t -> t
+    -- | hypot function (square root of squares)
+    normL2 :: Vector n t -> t
+    -- | Maximum of absolute values
+    normLPInf :: Vector n t -> t
+    -- | Minimum of absolute values
+    normLNInf :: Vector n t -> t
+    -- | Norm in Lp space
+    normLP :: Int -> Vector n t -> t
+
+{-# RULES
+"normLP/L1" normLP 1 = normL1
+"normLP/L2" normLP 2 = normL2
+    #-}
 
 class VectorMath n t => VectorFracMath n t where
     inverse :: Matrix n t -> Matrix n t
@@ -130,3 +151,9 @@ class Vector2Math t where
 class VectorMath n t => MatrixProduct a n t where
     prod :: Matrix n t -> a n t -> a n t
 
+type Vector2 = Vector 2
+type Vector3 = Vector 3
+type Vector4 = Vector 4
+type Matrix2 = Matrix 2
+type Matrix3 = Matrix 3
+type Matrix4 = Matrix 4
