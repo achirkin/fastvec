@@ -25,6 +25,7 @@ import Data.Geometry.Instances.Real       as X ()
 import Data.Geometry.Instances.RealFrac   as X ()
 import Data.Geometry.Instances.RealFloat  as X ()
 import Data.Geometry.Quaternion           as X
+import Data.Geometry.Prim.JSNum           as X (JSNum (..))
 #else
 import Data.Geometry.Instances.Floating3  as X ()
 import Data.Geometry.Instances.Floating4  as X ()
