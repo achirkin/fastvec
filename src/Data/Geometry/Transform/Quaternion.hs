@@ -46,24 +46,31 @@ instance Monad QFTransform where
 
 instance SpaceTransform QFTransform 3 Float where
     rotate v a = QFTransform (axisRotation v a) 0
-    scale c = QFTransform (setQ 0 0 0 c) 0
+    scale c = QFTransform (setQ 0 0 0 (sqrt c)) 0
     translate = QFTransform 1
     unwrap (QFTransform _ _ x) = x
     wrap x (QFTransform a b _) = QFTransform a b x
     liftTransform (QFTransform q v t) = fmap (QFTransform q v) t
     mergeSecond tr (QFTransform q v t) = fmap (\f -> f t) tr
-            >>= translate v
-            >>= scale c
-            >>= rotate axis angle
+                                       >>= translate v
+                                       >>= scale c
+                                       >>=
+        if vl2 <= c*10e-10
+        then return
+        else rotate (unit axis) angle
         where c = square q
-              axis = unit $ imVec q
-              angle = atan2 (normL2 $ imVec q) (taker q)
+              axis = imVec q
+              vl2 = dot axis axis
+              angle = 2* atan2 (sqrt vl2) (taker q)
     mergeFirst (QFTransform q v f) = (<*>) $ translate v f
-            >>= scale c
-            >>= rotate axis angle
+            >>= scale c >>=
+        if vl2 <= c*10e-10
+        then return
+        else rotate (unit axis) angle
         where c = square q
-              axis = unit $ imVec q
-              angle = atan2 (normL2 $ imVec q) (taker q)
+              axis = imVec q
+              vl2 = dot axis axis
+              angle = 2* atan2 (sqrt vl2) (taker q)
     inverseTransform (QFTransform q v x) | q == 0    = QFTransform 0 (-v) x
                                          | otherwise = QFTransform p (- rotScale p v) x
         where p = recip q
@@ -80,10 +87,17 @@ instance SpaceTransform QFTransform 3 Float where
     transformMH m = QFTransform (js_fromMatrix4x4F m)
         $ case colsOfM4 m of (_,_,_, v) -> resizeVector v
 
+{-# RULES
+"mergeSecond/QFQF" mergeSecond = (<*>) :: QFTransform (x -> y) -> QFTransform x -> QFTransform y
+"mergeSecond/QDQD" mergeSecond = (<*>) :: QDTransform (x -> y) -> QDTransform x -> QDTransform y
+"mergeFirst/QFQF" mergeFirst = (<*>) :: QFTransform (x -> y) -> QFTransform x -> QFTransform y
+"mergeFirst/QDQD" mergeFirst = (<*>) :: QDTransform (x -> y) -> QDTransform x -> QDTransform y
+    #-}
+
 instance Space3DTransform (QFTransform) Float QFloat where
-    rotateX a = QFTransform (setQ (sin a) 0 0 (cos a)) 0
-    rotateY a = QFTransform (setQ 0 (sin a) 0 (cos a)) 0
-    rotateZ a = QFTransform (setQ 0 0 (sin a) (cos a)) 0
+    rotateX a = QFTransform (setQ (sin (a/2)) 0 0 (cos (a/2))) 0
+    rotateY a = QFTransform (setQ 0 (sin (a/2)) 0 (cos (a/2))) 0
+    rotateZ a = QFTransform (setQ 0 0 (sin (a/2)) (cos (a/2))) 0
     rotateScale q = QFTransform q 0
 
 
@@ -102,24 +116,31 @@ instance Monad QDTransform where
 
 instance SpaceTransform QDTransform 3 Double where
     rotate v a = QDTransform (axisRotation v a) 0
-    scale c = QDTransform (setQ 0 0 0 c) 0
+    scale c = QDTransform (setQ 0 0 0 (sqrt c)) 0
     translate = QDTransform 1
     unwrap (QDTransform _ _ x) = x
     wrap x (QDTransform a b _) = QDTransform a b x
     liftTransform (QDTransform q v t) = fmap (QDTransform q v) t
     mergeSecond tr (QDTransform q v t) = fmap (\f -> f t) tr
-            >>= translate v
-            >>= scale c
-            >>= rotate axis angle
+                                       >>= translate v
+                                       >>= scale c
+                                       >>=
+        if vl2 <= c*10e-10
+        then return
+        else rotate (unit axis) angle
         where c = square q
-              axis = unit $ imVec q
-              angle = atan2 (normL2 $ imVec q) (taker q)
+              axis = imVec q
+              vl2 = dot axis axis
+              angle = 2* atan2 (sqrt vl2) (taker q)
     mergeFirst (QDTransform q v f) = (<*>) $ translate v f
-            >>= scale c
-            >>= rotate axis angle
+            >>= scale c >>=
+        if vl2 <= c*10e-10
+        then return
+        else rotate (unit axis) angle
         where c = square q
-              axis = unit $ imVec q
-              angle = atan2 (normL2 $ imVec q) (taker q)
+              axis = imVec q
+              vl2 = dot axis axis
+              angle = 2* atan2 (sqrt vl2) (taker q)
     inverseTransform (QDTransform q v x) | q == 0    = QDTransform 0 (-v) x
                                          | otherwise = QDTransform p (- rotScale p v) x
         where p = recip q
@@ -137,9 +158,9 @@ instance SpaceTransform QDTransform 3 Double where
         $ case colsOfM4 m of (_,_,_, v) -> resizeVector v
 
 instance Space3DTransform (QDTransform) Double QDouble where
-    rotateX a = QDTransform (setQ (sin a) 0 0 (cos a)) 0
-    rotateY a = QDTransform (setQ 0 (sin a) 0 (cos a)) 0
-    rotateZ a = QDTransform (setQ 0 0 (sin a) (cos a)) 0
+    rotateX a = QDTransform (setQ (sin (a/2)) 0 0 (cos (a/2))) 0
+    rotateY a = QDTransform (setQ 0 (sin (a/2)) 0 (cos (a/2))) 0
+    rotateZ a = QDTransform (setQ 0 0 (sin (a/2)) (cos (a/2))) 0
     rotateScale q = QDTransform q 0
 
 

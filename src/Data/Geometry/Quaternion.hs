@@ -342,17 +342,17 @@ foreign import javascript unsafe "[ $1[3]*$2[0] + $1[0]*$2[3] + $1[1]*$2[2] - $1
     js_timesD :: QDouble -> QDouble -> QDouble
 
 {-# INLINE js_absF #-}
-foreign import javascript unsafe "[0,0,0,Math.sqrt($1[0]*$1[0] + $1[1]*$1[1] + $1[2]*$1[2] + $1[3]*$1[3])]"
+foreign import javascript unsafe "[0,0,0,Math.hypot($1[0],$1[1],$1[2],$1[3])]"
     js_absF :: QFloat -> QFloat
 {-# INLINE js_absD #-}
-foreign import javascript unsafe "[0,0,0,Math.sqrt($1[0]*$1[0] + $1[1]*$1[1] + $1[2]*$1[2] + $1[3]*$1[3])]"
+foreign import javascript unsafe "[0,0,0,Math.hypot($1[0],$1[1],$1[2],$1[3])]"
     js_absD :: QDouble -> QDouble
 
 {-# INLINE js_signumF #-}
-foreign import javascript unsafe "var l = 1 / Math.sqrt($1[0]*$1[0] + $1[1]*$1[1] + $1[2]*$1[2] + $1[3]*$1[3]); $r = $1.map(function (e) {return e * l;})"
+foreign import javascript unsafe "var l = 1 / Math.hypot($1[0],$1[1],$1[2],$1[3]); $r = $1.map(function (e) {return e * l;})"
     js_signumF :: QFloat -> QFloat
 {-# INLINE js_signumD #-}
-foreign import javascript unsafe "var l = 1 / Math.sqrt($1[0]*$1[0] + $1[1]*$1[1] + $1[2]*$1[2] + $1[3]*$1[3]); $r = $1.map(function (e) {return e * l;})"
+foreign import javascript unsafe "var l = 1 / Math.hypot($1[0],$1[1],$1[2],$1[3]); $r = $1.map(function (e) {return e * l;})"
     js_signumD :: QDouble -> QDouble
 
 {-# INLINE js_negateF #-}
@@ -442,7 +442,7 @@ instance  Floating QFloat where
 foreign import javascript unsafe "[0,0,0,Math.PI]"
     js_piF :: QFloat
 {-# INLINE js_expF #-}
-foreign import javascript unsafe "var mv = Math.sqrt($1[0]*$1[0] + $1[1]*$1[1] + $1[2]*$1[2]), et = Math.exp($1[3]);\n\
+foreign import javascript unsafe "var mv = Math.hypot($1[0],$1[1],$1[2]), et = Math.exp($1[3]);\n\
                                  \ if(mv === 0) {$r = [0,0,0,et];}\
                                  \ else { var l = et * Math.sin(mv) / mv;\n\
                                  \ $r = [$1[0]*l,$1[1]*l,$1[2]*l,et*Math.cos(mv)]; }"
@@ -554,7 +554,7 @@ instance  Floating QDouble where
 foreign import javascript unsafe "[0,0,0,Math.PI]"
     js_piD :: QDouble
 {-# INLINE js_expD #-}
-foreign import javascript unsafe "var mv = Math.sqrt($1[0]*$1[0] + $1[1]*$1[1] + $1[2]*$1[2]), et = Math.exp($1[3]);\n\
+foreign import javascript unsafe "var mv = Math.hypot($1[0],$1[1],$1[2]), et = Math.exp($1[3]);\n\
                                  \ if(mv === 0) {$r = [0,0,0,et];}\
                                  \ else { var l = et * Math.sin(mv) / mv;\n\
                                  \ $r = [$1[0]*l,$1[1]*l,$1[2]*l,et*Math.cos(mv)]; }"

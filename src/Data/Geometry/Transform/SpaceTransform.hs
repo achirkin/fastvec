@@ -65,6 +65,11 @@ class Monad s => SpaceTransform s (n :: Nat) t | s -> n, s -> t where
     -- | Create transform from transformation matrix -- homogeneous coordinates
     transformMH :: (Eq t, Floating t) => Matrix (n+1) t -> x -> s x
 
+{-# RULES
+"mergeSecond/any" mergeSecond = (<*>) :: (SpaceTransform z n t) => z (x -> y) -> z x -> z y
+"mergeFirst/any" mergeFirst = (<*>) :: (SpaceTransform z n t) => z (x -> y) -> z x -> z y
+    #-}
+
 class ( Monad s
       , SpaceTransform s 3 t
       , Quaternion q t

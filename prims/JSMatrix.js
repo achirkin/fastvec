@@ -29,7 +29,7 @@ function rotateYM(a) {
     return [ c, 0,-s, 0
            , 0, 1, 0, 0
            , s, 0, c, 0
-           , 0, 0, 0, 0];
+           , 0, 0, 0, 1];
 }
 
 function rotateZM(a) {
@@ -64,20 +64,26 @@ function rotateEulerM(x, y, z) {
 
 function fromQuaternion(quat) {
     'use strict';
-    var x = quat[0], y = quat[1], z = quat[2], c = quat[3];
+    var x = quat[0], y = quat[1], z = quat[2], w = quat[3];
+    var w2 = w*w;
     if (x === 0 && y === 0 && z === 0) {
-        var r = c*c;
-        return [r,0,0,0
-               ,0,r,0,0
-               ,0,0,r,0
+        return [w2,0,0,0
+               ,0,w2,0,0
+               ,0,0,w2,0
                ,0,0,0,1];
     }
-    var l = Math.hypot(x,y,z,c);
+    var x2 = x*x, y2 = y*y, z2 = z*z;
+    var l2 = x2+y2+z2+w2;
+    return [ l2 - 2*(z2 + y2),    2*(x*y + z*w),    2*(x*z - y*w), 0
+           ,    2*(x*y - z*w), l2 - 2*(z2 + x2),    2*(y*z + x*w), 0
+           ,    2*(x*z + y*w),    2*(y*z - x*w), l2 - 2*(y2 + x2), 0
+           , 0, 0, 0, 1];
+/*    var l = Math.hypot(x,y,z,c);
     var c1 = l/(l+c);
     return [ l*c + c1*x*x, c1*x*y + l*z, c1*x*z - l*y, 0
            , c1*x*y - l*z, l*c + c1*y*y, c1*y*z + l*x, 0
            , c1*x*z + l*y, c1*y*z - l*x, l*c + c1*z*z, 0
-           , 0, 0, 0, 1];
+           , 0, 0, 0, 1]; */
 }
 
 function lookAtMatrix(up,camera,point) {
