@@ -15,31 +15,36 @@ function getRotScale(a, b) {
     'use strict';
     if (b[0] === 0 && b[1] === 0 && b[2] === 0) { return [0,0,0,0];}
     if (a[0] === 0 && a[1] === 0 && a[2] === 0) { return [Infinity,Infinity,Infinity,Infinity];}
+    var t = cross(a, b);
     var ma = Math.hypot(a[0],a[1],a[2]);
     var mb = Math.hypot(b[0],b[1],b[2]);
     var dot = a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+    if (t[0] === 0 && t[1] === 0 && t[2] === 0) {
+        if (dot > 0) {return [0,0,0,1];}
+        else         {return [0,0,Math.sqrt(mb/ma),0];}
+    }
     var c = Math.sqrt(ma*mb + dot);
     ma *= Math.SQRT2;
-    return [ (a[1]*b[2] - a[2]*b[1])/ma/c
-           , (a[2]*b[0] - a[0]*b[2])/ma/c
-           , (a[0]*b[1] - a[1]*b[0])/ma/c
+    return [ (a[1]*b[2] - a[2]*b[1])/(ma*c)
+           , (a[2]*b[0] - a[0]*b[2])/(ma*c)
+           , (a[0]*b[1] - a[1]*b[0])/(ma*c)
            , c/ma
            ];
 }
 
 function axisRotation(axis, a) {
     'use strict';
-    if (axis[0] === 0 && axis[1] === 0 && axis[2] === 0) { return [0,0,0,0];}
-    var c = Math.cos(a/2), s = Math.sin(a/2)/Math.hypot(axis[0],axis[1],axis[2]);
+    if (axis[0] === 0 && axis[1] === 0 && axis[2] === 0) { return [0,0,0,1];}
+    var c = Math.cos(a*0.5), s = Math.sin(a*0.5) / Math.hypot(axis[0],axis[1],axis[2]);
     return [ axis[0]*s, axis[1]*s, axis[2]*s, c];
 }
 
 function fromMatrix3x3(m) {
     'use strict';
     var d = Math.cbrt(
-          mat[0]*(mat[4]*mat[8]-mat[5]*mat[7])
-        - mat[1]*(mat[3]*mat[8]-mat[5]*mat[6])
-        + mat[2]*(mat[3]*mat[7]-mat[4]*mat[6]));
+          m[0]*(m[4]*m[8]-m[5]*m[7])
+        - m[1]*(m[3]*m[8]-m[5]*m[6])
+        + m[2]*(m[3]*m[7]-m[4]*m[6]));
     return [ Math.sqrt(Math.max( 0, d + m[0] - m[4] - m[8] )) * Math.sign(m[5] - m[7]) * 0.5
            , Math.sqrt(Math.max( 0, d - m[0] + m[4] - m[8] )) * Math.sign(m[6] - m[2]) * 0.5
            , Math.sqrt(Math.max( 0, d - m[0] - m[4] + m[8] )) * Math.sign(m[1] - m[3]) * 0.5
@@ -49,9 +54,9 @@ function fromMatrix3x3(m) {
 function fromMatrix4x4(m) {
     'use strict';
     var d = Math.cbrt(
-          mat[0]*(mat[5]*mat[10]-mat[6]*mat[9])
-        - mat[1]*(mat[4]*mat[10]-mat[6]*mat[8])
-        + mat[2]*(mat[4]*mat[ 9]-mat[5]*mat[8]));
+          m[0]*(m[5]*m[10]-m[6]*m[9])
+        - m[1]*(m[4]*m[10]-m[6]*m[8])
+        + m[2]*(m[4]*m[ 9]-m[5]*m[8]));
     return [ Math.sqrt(Math.max( 0, d + m[0] - m[5] - m[10] )) * Math.sign(m[6] - m[9]) * 0.5 / m[15]
            , Math.sqrt(Math.max( 0, d - m[0] + m[5] - m[10] )) * Math.sign(m[8] - m[2]) * 0.5 / m[15]
            , Math.sqrt(Math.max( 0, d - m[0] - m[5] + m[10] )) * Math.sign(m[1] - m[4]) * 0.5 / m[15]
