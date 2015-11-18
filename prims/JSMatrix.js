@@ -78,17 +78,11 @@ function fromQuaternion(quat) {
            ,    2*(x*y - z*w), l2 - 2*(z2 + x2),    2*(y*z + x*w), 0
            ,    2*(x*z + y*w),    2*(y*z - x*w), l2 - 2*(y2 + x2), 0
            , 0, 0, 0, 1];
-/*    var l = Math.hypot(x,y,z,c);
-    var c1 = l/(l+c);
-    return [ l*c + c1*x*x, c1*x*y + l*z, c1*x*z - l*y, 0
-           , c1*x*y - l*z, l*c + c1*y*y, c1*y*z + l*x, 0
-           , c1*x*z + l*y, c1*y*z - l*x, l*c + c1*z*z, 0
-           , 0, 0, 0, 1]; */
 }
 
 function lookAtMatrix(up,camera,point) {
     'use strict';
-    var zDir = [camera[0]-point[0],camera[1]-point[1],camera[2]-point[2]];
+    var zDir = minusJSVec(camera,point);
     var t = Math.hypot.apply(null,zDir);
     zDir = zDir.map(function (e){return e / t;});
     var xDir = cross(up,zDir);

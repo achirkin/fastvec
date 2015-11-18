@@ -30,7 +30,7 @@ import Foreign.C.Types
 
 
 {-# INLINE broadcastJSVec #-}
-foreign import javascript unsafe "$r = broadcastJSVec($1,$2)"
+foreign import javascript unsafe "broadcastJSVec($1,$2)"
     broadcastJSVec :: JSVal -> Int -> JSVal
 
 class (Num a) => JSNum a where
@@ -40,9 +40,9 @@ class (Num a) => JSNum a where
 
 -- convert to / from JSVal
 #define JSNUM(T) \
-    foreign import javascript unsafe "$r = $1" \
+    foreign import javascript unsafe "$r = $1;" \
         toNum/**/T :: JSVal -> T;  {-# INLINE toNum/**/T #-}; \
-    foreign import javascript unsafe "$r = $1" \
+    foreign import javascript unsafe "$r = $1;" \
         fromNum/**/T :: T -> JSVal;  {-# INLINE fromNum/**/T #-}; \
     instance JSNum T where { \
         toNum = toNum/**/T; {-# INLINE toNum #-}; \
@@ -92,44 +92,44 @@ foreign import javascript unsafe "normL2($1)"
 
 
 {-# INLINE eyeJSMat #-}
-foreign import javascript unsafe "$r = eyeJSMat($1)"
+foreign import javascript unsafe "eyeJSMat($1)"
     eyeJSMat :: Int -> JSVal
 
 {-# INLINE diagJSMat #-}
-foreign import javascript unsafe "$r = diagJSMat($1,$2)"
+foreign import javascript unsafe "diagJSMat($1,$2)"
     diagJSMat :: JSVal -> Int -> JSVal
 
 {-# INLINE transposeJSMat #-}
-foreign import javascript unsafe "$r = transposeJSMat($1,$2) "
+foreign import javascript unsafe "transposeJSMat($1,$2) "
     transposeJSMat :: JSVal -> Int -> JSVal
 
 {-# INLINE detJSMat #-}
-foreign import javascript unsafe "$r = detJSMat($1,$2)"
+foreign import javascript unsafe "detJSMat($1,$2)"
     detJSMat :: JSVal -> Int -> JSVal
 
 {-# INLINE traceJSMat #-}
-foreign import javascript unsafe "$r = traceJSMat($1,$2)"
+foreign import javascript unsafe "traceJSMat($1,$2)"
     traceJSMat :: JSVal -> Int -> JSVal
 
 {-# INLINE fromDiagJSMat #-}
-foreign import javascript unsafe "$r = fromDiagJSMat($1,$2)"
+foreign import javascript unsafe "fromDiagJSMat($1,$2)"
     fromDiagJSMat :: JSVal -> Int -> JSVal
 
 {-# INLINE toDiagJSMat #-}
-foreign import javascript unsafe "$r = toDiagJSMat($1)"
+foreign import javascript unsafe "toDiagJSMat($1)"
     toDiagJSMat :: JSVal -> JSVal
 
 {-# INLINE dotJSVec #-}
-foreign import javascript unsafe "$r = dotJSVec($1,$2)"
+foreign import javascript unsafe "dotJSVec($1,$2)"
     dotJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE dotBJSVec #-}
-foreign import javascript unsafe "$r = dotBJSVec($1,$2)"
+foreign import javascript unsafe "dotBJSVec($1,$2)"
     dotBJSVec :: JSVal -> JSVal -> JSVal
 
 
 {-# INLINE indexJSVec #-}
-foreign import javascript unsafe "$r = $2[$1]"
+foreign import javascript unsafe "$2[$1]"
     indexJSVec :: Int -> JSVal -> JSVal
 
 {-# INLINE unpackJSVec4 #-}
@@ -145,202 +145,202 @@ foreign import javascript unsafe "$r1 = $1[0]; $r2 = $1[1];"
     unpackJSVec2 :: JSVal -> (# JSVal,JSVal #)
 
 {-# INLINE matColsJS #-}
-foreign import javascript unsafe "$r = matColsJS($1,$2)"
+foreign import javascript unsafe "matColsJS($1,$2)"
     matColsJS :: JSVal -> Int -> JSVal
 
 {-# INLINE matRowsJS #-}
-foreign import javascript unsafe "$r = matRowsJS($1,$2)"
+foreign import javascript unsafe "matRowsJS($1,$2)"
     matRowsJS :: JSVal -> Int -> JSVal
 
 {-# INLINE resizeJSVec #-}
-foreign import javascript unsafe "$r = resizeJSVec($1,$2)"
+foreign import javascript unsafe "resizeJSVec($1,$2)"
     resizeJSVec :: JSVal -> Int -> JSVal
 
 {-# INLINE resizeJSMat #-}
-foreign import javascript unsafe "$r = resizeJSMat($1,$2,$3)"
+foreign import javascript unsafe "resizeJSMat($1,$2,$3)"
     resizeJSMat :: JSVal -> Int -> Int -> JSVal
 
 -- MatrixProduct
 
 {-# INLINE prodJSMM #-}
-foreign import javascript unsafe "$r = prodJSMM($1,$2,$3)"
+foreign import javascript unsafe "prodJSMM($1,$2,$3)"
     prodJSMM :: JSVal -> JSVal -> Int -> JSVal
 
 {-# INLINE prodJSMV #-}
-foreign import javascript unsafe "$r = prodJSMV($1,$2)"
+foreign import javascript unsafe "prodJSMV($1,$2)"
     prodJSMV :: JSVal -> JSVal -> JSVal
 
 -- VectorFracMath
 
 {-# INLINE inverseJSM4 #-}
-foreign import javascript unsafe "$r = inverseJSM4($1)"
+foreign import javascript unsafe "inverseJSM4($1)"
     inverseJSM4 :: JSVal -> JSVal
 
 {-# INLINE inverseJSM3 #-}
-foreign import javascript unsafe "$r = inverseJSM3($1)"
+foreign import javascript unsafe "inverseJSM3($1)"
     inverseJSM3 :: JSVal -> JSVal
 
 {-# INLINE inverseJSM2 #-}
-foreign import javascript unsafe "$r = inverseJSM2($1)"
+foreign import javascript unsafe "inverseJSM2($1)"
     inverseJSM2 :: JSVal -> JSVal
 
 
 -- Show
 
 {-# INLINE showJSVec #-}
-foreign import javascript unsafe "$r = showJSVec($1)"
+foreign import javascript unsafe "showJSVec($1)"
     showJSVec :: JSVal -> JSString
 
 {-# INLINE showJSMat #-}
-foreign import javascript unsafe "$r = showJSMat($1,$2)"
+foreign import javascript unsafe "showJSMat($1,$2)"
     showJSMat :: JSVal -> Int -> JSString
 
 -- Eq
 
 {-# INLINE eqJSVec #-}
-foreign import javascript unsafe "$r = eqJSVec($1,$2)"
+foreign import javascript unsafe "eqJSVec($1,$2)"
     eqJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE neqJSVec #-}
-foreign import javascript unsafe "$r = neqJSVec($1,$2)"
+foreign import javascript unsafe "neqJSVec($1,$2)"
     neqJSVec :: JSVal -> JSVal -> Bool
 
 -- Ord
 
 {-# INLINE gtJSVec #-}
-foreign import javascript unsafe "$r = gtJSVec($1,$2)"
+foreign import javascript unsafe "gtJSVec($1,$2)"
     gtJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE ltJSVec #-}
-foreign import javascript unsafe "$r = ltJSVec($1,$2)"
+foreign import javascript unsafe "ltJSVec($1,$2)"
     ltJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE geJSVec #-}
-foreign import javascript unsafe "$r = geJSVec($1,$2)"
+foreign import javascript unsafe "geJSVec($1,$2)"
     geJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE leJSVec #-}
-foreign import javascript unsafe "$r = leJSVec($1,$2)"
+foreign import javascript unsafe "$leJSVec($1,$2)"
     leJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE maxJSVec #-}
-foreign import javascript unsafe "$r = maxJSVec($1,$2)"
+foreign import javascript unsafe "maxJSVec($1,$2)"
     maxJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE minJSVec #-}
-foreign import javascript unsafe "$r = minJSVec($1,$2)"
+foreign import javascript unsafe "minJSVec($1,$2)"
     minJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE cmpJSVec #-}
-foreign import javascript unsafe "$r = cmpJSVec($1,$2)"
+foreign import javascript unsafe "cmpJSVec($1,$2)"
     cmpJSVec :: JSVal -> JSVal -> Int
 
 
 -- Num
 
 {-# INLINE plusJSVec #-}
-foreign import javascript unsafe "$r = plusJSVec($1,$2)"
+foreign import javascript unsafe "plusJSVec($1,$2)"
     plusJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE minusJSVec #-}
-foreign import javascript unsafe "$r = minusJSVec($1,$2)"
+foreign import javascript unsafe "minusJSVec($1,$2)"
     minusJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE timesJSVec #-}
-foreign import javascript unsafe "$r = timesJSVec($1,$2)"
+foreign import javascript unsafe "timesJSVec($1,$2)"
     timesJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE negateJSVec #-}
-foreign import javascript unsafe "$r = negateJSVec($1)"
+foreign import javascript unsafe "negateJSVec($1)"
     negateJSVec :: JSVal -> JSVal
 
 {-# INLINE absJSVec #-}
-foreign import javascript unsafe "$r = absJSVec($1)"
+foreign import javascript unsafe "absJSVec($1)"
     absJSVec :: JSVal -> JSVal
 
 {-# INLINE signumJSVec #-}
-foreign import javascript unsafe "$r = signumJSVec($1)"
+foreign import javascript unsafe "signumJSVec($1)"
     signumJSVec :: JSVal -> JSVal
 
 
 -- Fractional
 
 {-# INLINE divideJSVec #-}
-foreign import javascript unsafe "$r = divideJSVec($1,$2)"
+foreign import javascript unsafe "divideJSVec($1,$2)"
     divideJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE recipJSVec #-}
-foreign import javascript unsafe "$r = recipJSVec($1)"
+foreign import javascript unsafe "recipJSVec($1)"
     recipJSVec :: JSVal -> JSVal
 
 -- Floating
 
 {-# INLINE piJSVec #-}
-foreign import javascript unsafe "$r = piJSVec($1)"
+foreign import javascript unsafe "piJSVec($1)"
     piJSVec :: Int -> JSVal
 
 {-# INLINE expJSVec #-}
-foreign import javascript unsafe "$r = expJSVec($1)"
+foreign import javascript unsafe "expJSVec($1)"
     expJSVec :: JSVal -> JSVal
 
 {-# INLINE logJSVec #-}
-foreign import javascript unsafe "$r = logJSVec($1)"
+foreign import javascript unsafe "logJSVec($1)"
     logJSVec :: JSVal -> JSVal
 
 {-# INLINE sqrtJSVec #-}
-foreign import javascript unsafe "$r = sqrtJSVec($1)"
+foreign import javascript unsafe "sqrtJSVec($1)"
     sqrtJSVec :: JSVal -> JSVal
 
 {-# INLINE powerJSVec #-}
-foreign import javascript unsafe "$r = powerJSVec($1,$2)"
+foreign import javascript unsafe "powerJSVec($1,$2)"
     powerJSVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE sinJSVec #-}
-foreign import javascript unsafe "$r = sinJSVec($1)"
+foreign import javascript unsafe "sinJSVec($1)"
     sinJSVec :: JSVal -> JSVal
 
 {-# INLINE cosJSVec #-}
-foreign import javascript unsafe "$r = cosJSVec($1)"
+foreign import javascript unsafe "cosJSVec($1)"
     cosJSVec :: JSVal -> JSVal
 
 {-# INLINE tanJSVec #-}
-foreign import javascript unsafe "$r = tanJSVec($1)"
+foreign import javascript unsafe "tanJSVec($1)"
     tanJSVec :: JSVal -> JSVal
 
 {-# INLINE asinJSVec #-}
-foreign import javascript unsafe "$r = asinJSVec($1)"
+foreign import javascript unsafe "asinJSVec($1)"
     asinJSVec :: JSVal -> JSVal
 
 {-# INLINE acosJSVec #-}
-foreign import javascript unsafe "$r = acosJSVec($1)"
+foreign import javascript unsafe "acosJSVec($1)"
     acosJSVec :: JSVal -> JSVal
 
 {-# INLINE atanJSVec #-}
-foreign import javascript unsafe "$r = atanJSVec($1)"
+foreign import javascript unsafe "atanJSVec($1)"
     atanJSVec :: JSVal -> JSVal
 
 {-# INLINE sinhJSVec #-}
-foreign import javascript unsafe "$r = sinhJSVec($1)"
+foreign import javascript unsafe "sinhJSVec($1)"
     sinhJSVec :: JSVal -> JSVal
 
 {-# INLINE coshJSVec #-}
-foreign import javascript unsafe "$r = coshJSVec($1)"
+foreign import javascript unsafe "coshJSVec($1)"
     coshJSVec :: JSVal -> JSVal
 
 {-# INLINE tanhJSVec #-}
-foreign import javascript unsafe "$r = tanhJSVec($1)"
+foreign import javascript unsafe "tanhJSVec($1)"
     tanhJSVec :: JSVal -> JSVal
 
 {-# INLINE asinhJSVec #-}
-foreign import javascript unsafe "$r = asinhJSVec($1)"
+foreign import javascript unsafe "asinhJSVec($1)"
     asinhJSVec :: JSVal -> JSVal
 
 {-# INLINE acoshJSVec #-}
-foreign import javascript unsafe "$r = acoshJSVec($1)"
+foreign import javascript unsafe "acoshJSVec($1)"
     acoshJSVec :: JSVal -> JSVal
 
 {-# INLINE atanhJSVec #-}
-foreign import javascript unsafe "$r = atanhJSVec($1)"
+foreign import javascript unsafe "atanhJSVec($1)"
     atanhJSVec :: JSVal -> JSVal
 
 
@@ -482,35 +482,35 @@ foreign import javascript unsafe "indexVecArray($1,$2,$3)"
 -- Integral
 
 {-# INLINE js_quot #-}
-foreign import javascript unsafe "$r = $1.map(function (e, i) { return (e / $2[i] | 0);})"
+foreign import javascript unsafe "$1.map(function (e, i) { return (e / $2[i] | 0);})"
     js_quot :: JSVal -> JSVal -> JSVal
 
 {-# INLINE js_rem #-}
-foreign import javascript unsafe "$r = $1.map(function (e, i) { return e - (e / $2[i] | 0)*$2[i];})"
+foreign import javascript unsafe "$1.map(function (e, i) { return e - (e / $2[i] | 0)*$2[i];})"
     js_rem :: JSVal -> JSVal -> JSVal
 
 {-# INLINE js_quotRem #-}
-foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e, i) { var x = e / $2[i] | 0; $r1.push(x); $r2.push(e - x*$2[i]);})"
+foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e, i) { var x = e / $2[i] | 0; $r1.push(x); $r2.push(e - x*$2[i]);});"
     js_quotRem :: JSVal -> JSVal -> (JSVal, JSVal)
 
 {-# INLINE js_div #-}
-foreign import javascript unsafe "$r = $1.map(function (e, i) { return Math.floor(e / $2[i]);})"
+foreign import javascript unsafe "$1.map(function (e, i) { return Math.floor(e / $2[i]);})"
     js_div :: JSVal -> JSVal -> JSVal
 
 {-# INLINE js_mod #-}
-foreign import javascript unsafe "$r = $1.map(function (e, i) { return e - Math.floor(e / $2[i])*$2[i];})"
+foreign import javascript unsafe "$1.map(function (e, i) { return e - Math.floor(e / $2[i])*$2[i];})"
     js_mod :: JSVal -> JSVal -> JSVal
 
 {-# INLINE js_divMod #-}
-foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e, i) { var x = Math.floor(e / $2[i]); $r1.push(x); $r2.push(e - x*$2[i]);})"
+foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e, i) { var x = Math.floor(e / $2[i]); $r1.push(x); $r2.push(e - x*$2[i]);});"
     js_divMod :: JSVal -> JSVal -> (JSVal, JSVal)
 
 {-# INLINE js_gcdVec #-}
-foreign import javascript unsafe "$r = gcdVec($1,$2)"
+foreign import javascript unsafe "gcdVec($1,$2)"
     js_gcdVec :: JSVal -> JSVal -> JSVal
 
 {-# INLINE js_lcmVec #-}
-foreign import javascript unsafe "$r = lcmVec($1,$2)"
+foreign import javascript unsafe "lcmVec($1,$2)"
     js_lcmVec :: JSVal -> JSVal -> JSVal
 
 
@@ -534,7 +534,7 @@ foreign import javascript unsafe "$1.map(Math.floor)"
     js_floor :: JSVal -> JSVal
 
 {-# INLINE js_properFraction #-}
-foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e) { var x = e | 0; $r1.push(x); $r2.push(e - x);})"
+foreign import javascript unsafe "$r1 = []; $r2 = []; $1.foreach(function (e) { var x = e | 0; $r1.push(x); $r2.push(e - x);});"
     js_properFraction :: JSVal -> (JSVal, JSVal)
 
 -- Misc ops
@@ -547,20 +547,20 @@ foreign import javascript unsafe "[$1[1]*$2[2]-$1[2]*$2[1],$1[2]*$2[0]-$1[0]*$2[
 foreign import javascript unsafe "$1[0]*$2[1]-$1[1]*$2[0]"
     js_det2 :: JSVal -> JSVal -> JSVal
 
-foreign import javascript unsafe "$r = [$1,$2]"
+foreign import javascript unsafe "[$1,$2]"
     jsVector2 :: JSVal -> JSVal -> JSVal
 
-foreign import javascript unsafe "$r = [$1,$2,$3]"
+foreign import javascript unsafe "[$1,$2,$3]"
     jsVector3 :: JSVal -> JSVal -> JSVal -> JSVal
 
-foreign import javascript unsafe "$r = [$1,$2,$3,$4]"
+foreign import javascript unsafe "[$1,$2,$3,$4]"
     jsVector4 :: JSVal -> JSVal -> JSVal -> JSVal -> JSVal
 
-foreign import javascript unsafe "$r = $1.concat($2)"
+foreign import javascript unsafe "$1.concat($2)"
     jsMatrix2 :: JSVal -> JSVal -> JSVal
 
-foreign import javascript unsafe "$r = $1.concat($2,$3)"
+foreign import javascript unsafe "$1.concat($2,$3)"
     jsMatrix3 :: JSVal -> JSVal -> JSVal -> JSVal
 
-foreign import javascript unsafe "$r = $1.concat($2,$3,$4)"
+foreign import javascript unsafe "$1.concat($2,$3,$4)"
     jsMatrix4 :: JSVal -> JSVal -> JSVal -> JSVal -> JSVal
