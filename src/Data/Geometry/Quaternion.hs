@@ -77,6 +77,8 @@ class Quaternion a t | a -> t, t -> a where
     getRotScale :: Vector3 t-> Vector3 t -> a
     -- | Creates a rotation versor from an axis vector and an angle in radians.
     axisRotation :: Vector3 t -> t -> a
+    -- | quaternion rotation angle
+    qArg :: a -> t
 
 
 instance Quaternion QFloat Float where
@@ -114,6 +116,8 @@ instance Quaternion QFloat Float where
     getRotScale = js_getRotScaleF
     {-# INLINE axisRotation #-}
     axisRotation = js_axisRotationF
+    {-# INLINE qArg #-}
+    qArg = js_qArgF
 
 instance Quaternion QDouble Double where
     {-# INLINE setQ #-}
@@ -150,6 +154,8 @@ instance Quaternion QDouble Double where
     getRotScale = js_getRotScaleD
     {-# INLINE axisRotation #-}
     axisRotation = js_axisRotationD
+    {-# INLINE qArg #-}
+    qArg = js_qArgD
 
 
 {-# INLINE js_setQF #-}
@@ -167,17 +173,17 @@ foreign import javascript unsafe "[$1[0],$1[1],$1[2],$2]"
     js_fromVecNumD :: Vector3 Double -> Double -> QDouble
 
 {-# INLINE js_fromVec4F #-}
-foreign import javascript unsafe "Array.from($1)"
+foreign import javascript unsafe "$1.slice()"
     js_fromVec4F :: Vector4 Float -> QFloat
 {-# INLINE js_fromVec4D #-}
-foreign import javascript unsafe "Array.from($1)"
+foreign import javascript unsafe "$1.slice()"
     js_fromVec4D :: Vector4 Double -> QDouble
 
 {-# INLINE js_toVec4F #-}
-foreign import javascript unsafe "Array.from($1)"
+foreign import javascript unsafe "$1.slice()"
     js_toVec4F :: QFloat -> Vector4 Float
 {-# INLINE js_toVec4D #-}
-foreign import javascript unsafe "Array.from($1)"
+foreign import javascript unsafe "$1.slice()"
     js_toVec4D :: QDouble -> Vector4 Double
 
 {-# INLINE js_unpackQF #-}
@@ -274,7 +280,13 @@ foreign import javascript unsafe "axisRotation($1,$2)"
     js_axisRotationD :: Vector3 Double -> Double -> QDouble
 
 
+{-# INLINE js_qArgF #-}
+foreign import javascript unsafe "qArg($1)"
+    js_qArgF :: QFloat -> Float
 
+{-# INLINE js_qArgD #-}
+foreign import javascript unsafe "qArg($1)"
+    js_qArgD :: QDouble -> Double
 
 --------------------------------------------------------------------------
 -- Num

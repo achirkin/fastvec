@@ -11,6 +11,11 @@ function rotScale(quat, vec) {
            ];
 }
 
+function qArg(quat) {
+    'use strict';
+    return Math.atan2( Math.hypot(quat[0],quat[1],quat[2]) , quat[3] ) * 2 ;
+}
+
 function getRotScale(a, b) {
     'use strict';
     if (b[0] === 0 && b[1] === 0 && b[2] === 0) { return [0,0,0,0];}
@@ -20,7 +25,7 @@ function getRotScale(a, b) {
     var mb = Math.hypot(b[0],b[1],b[2]);
     var dot = a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
     if (t[0] === 0 && t[1] === 0 && t[2] === 0) {
-        if (dot > 0) {return [0,0,0,1];}
+        if (dot > 0) {return [0,0,0,Math.sqrt(mb/ma)];}
         else         {return [0,0,Math.sqrt(mb/ma),0];}
     }
     var c = Math.sqrt(ma*mb + dot);

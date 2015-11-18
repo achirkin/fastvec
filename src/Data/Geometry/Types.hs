@@ -34,7 +34,7 @@ import Data.Geometry.Prim.JSNum
 
 
 {-# INLINE fromHom #-}
-foreign import javascript unsafe "var l = $1[$1.length-1]; if(l !== 0){$r = $1.map(function(e){return e/l;});}else{$r = Array.from($1);} $r.pop();"
+foreign import javascript unsafe "$r = $1.slice(); var l = $r.pop(); if(l !== 0){$r = $r.map(function(e){return e/l;});};"
     fromHom :: Vector (n+1) t -> Vector n t
 
 
