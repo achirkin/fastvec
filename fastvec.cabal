@@ -29,11 +29,9 @@ library
     if impl(ghcjs -any)
         build-depends:
             base >=4.8.0.0 && <4.9,
-            ghcjs-base ==0.2.*,
+            ghcjs-base-alt ==0.2.*,
             ghcjs-prim ==0.1.*
         cpp-options: -DUSE_JAVASCRIPTFFI
-        exposed-modules:
-            Data.Geometry.Math.Statistics
         other-modules:
             Data.Geometry.Types
             Data.Geometry.Instances.Eq
@@ -91,7 +89,7 @@ executable TempTests
     if impl(ghcjs -any)
         build-depends:
             base >=4.8.0.0 && <4.9,
-            ghcjs-base ==0.2.*,
+            ghcjs-base-alt ==0.2.*,
             ghcjs-prim ==0.1.*
         cpp-options: -DUSE_JAVASCRIPTFFI
         other-modules:
