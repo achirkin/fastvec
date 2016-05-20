@@ -19,13 +19,13 @@ import Data.Foldable (foldr')
 import Data.Coerce (coerce)
 import GHC.TypeLits (KnownNat)
 --import GHCJS.Marshal
---import GHCJS.Types
+--import JsHs.Types
 import Unsafe.Coerce (unsafeCoerce)
 
-import JavaScript.TypedArray
-import qualified JavaScript.TypedArray.IO as IO
+import JsHs.TypedArray
+import qualified JsHs.TypedArray.IO as IO
 import qualified Control.Monad.ST as ST
-import qualified JavaScript.TypedArray.ST as ST
+import qualified JsHs.TypedArray.ST as ST
 
 
 import Data.Geometry.Prim.JSNum

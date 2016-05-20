@@ -28,9 +28,8 @@ library
 
     if impl(ghcjs -any)
         build-depends:
-            base >=4.8.0.0 && <4.9,
-            ghcjs-base-alt ==0.2.*,
-            ghcjs-prim ==0.1.*
+            base >=4.8.0.0 && <5,
+            ghcjs-hs-interop -any
         cpp-options: -DUSE_JAVASCRIPTFFI
         other-modules:
             Data.Geometry.Types
@@ -56,7 +55,7 @@ library
 
     if !impl(ghcjs -any)
         build-depends:
-            base >=4.8.0.0 && <4.9,
+            base >=4.8.0.0 && <5,
             ghc-prim >=0.4 && <0.5
         other-modules:
             Data.Geometry.Types
@@ -88,9 +87,8 @@ executable TempTests
 
     if impl(ghcjs -any)
         build-depends:
-            base >=4.8.0.0 && <4.9,
-            ghcjs-base-alt ==0.2.*,
-            ghcjs-prim ==0.1.*
+            base >=4.8.0.0 && <5,
+            ghcjs-hs-interop -any
         cpp-options: -DUSE_JAVASCRIPTFFI
         other-modules:
             Data.Geometry
@@ -118,7 +116,7 @@ executable TempTests
 
     if !impl(ghcjs -any)
         build-depends:
-            base >=4.8.0.0 && <4.9,
+            base >=4.8.0.0 && <5,
             ghc-prim >=0.4 && <0.5
         other-modules:
             Data.Geometry

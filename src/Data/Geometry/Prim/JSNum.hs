@@ -20,10 +20,10 @@ module Data.Geometry.Prim.JSNum
 
 import GHC.Exts as Exts
 
-import JavaScript.TypedArray
+import JsHs.TypedArray
 
-import GHCJS.Prim
-import GHCJS.Types
+import JsHs.Types.Prim
+import JsHs.Types
 import Data.Int
 import Data.Word
 import Foreign.C.Types
@@ -220,7 +220,7 @@ foreign import javascript unsafe "geJSVec($1,$2)"
     geJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE leJSVec #-}
-foreign import javascript unsafe "$leJSVec($1,$2)"
+foreign import javascript unsafe "leJSVec($1,$2)"
     leJSVec :: JSVal -> JSVal -> Bool
 
 {-# INLINE maxJSVec #-}

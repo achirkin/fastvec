@@ -24,7 +24,7 @@ import Data.Geometry.VectorMath
 #if defined(ghcjs_HOST_OS)
 
 import Data.Coerce (coerce)
-import Data.JSString (unpack')
+import JsHs.JSString (unpack')
 import GHC.TypeLits (KnownNat)
 
 import Data.Geometry.Prim.JSNum

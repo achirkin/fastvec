@@ -27,7 +27,7 @@ module Data.Geometry.Transform.Matrix4
 
 import GHC.TypeLits
 
-import GHCJS.Types
+import JsHs.Types
 
 import Data.Geometry.Quaternion
 import Data.Geometry.Types

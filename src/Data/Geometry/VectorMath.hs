@@ -40,23 +40,22 @@ import GHC.TypeLits
 #if defined(ghcjs_HOST_OS)
 
 import Data.Typeable
-import GHCJS.Types
-import GHCJS.Marshal.Pure
+import JsHs.Types
+import JsHs.LikeJS.Class
+-- import GHCJS.Marshal.Pure
 
 newtype Vector (n :: Nat) t = JSVector JSVal deriving Typeable
 instance IsJSVal (Vector n t)
 newtype Matrix (n :: Nat) t = JSMatrix JSVal deriving Typeable
 instance IsJSVal (Matrix n t)
 
-instance PToJSVal (Vector n t) where
-    pToJSVal (JSVector v) = v
-instance PFromJSVal (Vector n t) where
-    pFromJSVal = JSVector
+instance LikeJS "Array" (Vector n t) where
+    asJSVal (JSVector v) = v
+    asLikeJS = JSVector
 
-instance PToJSVal (Matrix n t) where
-    pToJSVal (JSMatrix v) = v
-instance PFromJSVal (Matrix n t) where
-    pFromJSVal = JSMatrix
+instance LikeJS "Array" (Matrix n t) where
+    asJSVal (JSMatrix v) = v
+    asLikeJS = JSMatrix
 
 class Dimensional a where
     dim :: a -> Int
