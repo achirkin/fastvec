@@ -23,7 +23,7 @@ import Foreign.Marshal
 import Foreign.Storable
 import Foreign.Ptr
 
---import GHCJS.Types
+--import JsHs.Types
 --import GHCJS.Prim
 --import GHCJS.Marshal
 --import JavaScript.Array
@@ -32,16 +32,16 @@ import Foreign.Ptr
 --import Data.Geometry.Prim.JSNum
 
 #if defined(ghcjs_HOST_OS)
-import JavaScript.TypedArray
-import JavaScript.TypedArray.IO
+import JsHs.TypedArray
+import JsHs.TypedArray.IO
 import qualified Control.Monad.ST as ST
-import qualified JavaScript.TypedArray.ST as ST
+import qualified JsHs.TypedArray.ST as ST
 import Data.Int
 
 import qualified GHC.Exts as Exts
 import Unsafe.Coerce
---import Data.JSString
-import GHCJS.Types
+--import JsHs.JSString
+import JsHs.Types
 #else
 #endif
 import Data.Geometry

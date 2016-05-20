@@ -35,8 +35,8 @@ import Data.Geometry.VectorMath
 import Data.Coerce (coerce)
 
 import GHC.TypeLits (KnownNat)
-import GHCJS.Prim
-import GHCJS.Types
+import JsHs.Types.Prim
+import JsHs.Types
 
 import Data.Geometry.Prim.JSNum
 

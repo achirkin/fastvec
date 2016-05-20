@@ -17,9 +17,9 @@ module Data.Geometry.Quaternion
     , Quaternion (..)
     ) where
 
-import Data.JSString (unpack')
-import GHCJS.Prim
-import GHCJS.Types
+import JsHs.JSString (unpack')
+import JsHs.Types.Prim
+import JsHs.Types
 import Data.Coerce (coerce)
 
 import Data.Geometry.VectorMath
