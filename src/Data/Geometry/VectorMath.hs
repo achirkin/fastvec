@@ -3,7 +3,7 @@
 {-# LANGUAGE CPP #-}
 #if defined(ghcjs_HOST_OS)
 {-# OPTIONS_GHC -fno-warn-unused-binds #-}
-{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, TypeFamilies #-}
 #else
 {-# LANGUAGE TypeFamilies #-}
 #endif
@@ -42,6 +42,7 @@ import GHC.TypeLits
 import Data.Typeable
 import JsHs.Types
 import JsHs.LikeJS.Class
+import JsHs.Array
 -- import GHCJS.Marshal.Pure
 
 newtype Vector (n :: Nat) t = JSVector JSVal deriving Typeable
@@ -56,6 +57,11 @@ instance LikeJS "Array" (Vector n t) where
 instance LikeJS "Array" (Matrix n t) where
     asJSVal (JSMatrix v) = v
     asLikeJS = JSMatrix
+
+instance (LikeJS t a) => LikeJSArray t (Vector n a) where
+    type ArrayElem (Vector n a) = a
+instance (LikeJS t a) => LikeJSArray t (Matrix n a) where
+    type ArrayElem (Matrix n a) = a
 
 class Dimensional a where
     dim :: a -> Int
