@@ -34,12 +34,12 @@ import Data.Geometry.Prim.JSNum
 
 
 {-# INLINE fromHom #-}
-foreign import javascript unsafe "$r = $1.slice(); var l = $r.pop(); if(l !== 0){$r = $r.map(function(e){return e/l;});};"
+foreign import javascript unsafe "$r = $1.slice(); var l = $r.pop(); if(l !== 0){$r = $r.map(function(e){return e/l;});}"
     fromHom :: Vector (n+1) t -> Vector n t
 
 
 {-# INLINE unit #-}
-foreign import javascript unsafe "var l = Math.hypot.apply(null,$1); $r = $1.map(function(e){return e/l;});"
+foreign import javascript unsafe "var l = Math.hypot.apply(null,$1); if(l !== 0){$r = $1.map(function(e){return e/l;});} else {$r = $1.slice();}"
     unit :: Vector n t -> Vector n t
 
 -- | Cross-product of two 3D vectors
