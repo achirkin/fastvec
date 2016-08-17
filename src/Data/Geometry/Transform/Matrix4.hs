@@ -27,12 +27,13 @@ module Data.Geometry.Transform.Matrix4
 
 import GHC.TypeLits
 
+#if defined(ghcjs_HOST_OS)
 import JsHs.Types
-
 import Data.Geometry.Quaternion
+import Data.Geometry.Prim.JSNum
+#endif
 import Data.Geometry.Types
 import Data.Geometry.VectorMath
-import Data.Geometry.Prim.JSNum
 import Data.Geometry.Transform.SpaceTransform
 
 

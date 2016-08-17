@@ -95,6 +95,9 @@ main = do
     let barr = typedArray 5 :: TypedArray (Vector 6 Float)
         arr = fromList [a,b,c,d]
         sarr = fillNewTypedArray 3 d
+        e = vector4 1 (-2.0124) 9.72 0.23
+        iv1 = vector3 113 63 (-135) :: Vector3 Int
+        iv2 = vector3 7 (-36) 15 :: Vector3 Int
     printAny barr
     printAnyVal sarr
     printAnyVal arr
@@ -157,10 +160,7 @@ main = do
     where a = vector4 2 0 0 2 :: Vector 4 Float
           b = vector4 0 1 0 0 :: Vector 4 Float
           c = vector4 0 0 4 0 :: Vector 4 Float
-          d = vector4 0 2 0 1
-          e = vector4 1 (-2.0124) 9.72 0.23
-          iv1 = vector3 113 63 (-135) :: Vector3 Int
-          iv2 = vector3 7 (-36) 15 :: Vector3 Int
+          d = vector4 0 2 0 1 :: Vector 4 Float
           m = matrix4x4 a b c d
           l = diag 6 :: Matrix 3 Float
 
