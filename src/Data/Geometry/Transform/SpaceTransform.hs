@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, DataKinds #-}
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Geometry.Transform.SpaceTransform
@@ -23,8 +24,9 @@ module Data.Geometry.Transform.SpaceTransform where
 import GHC.TypeLits
 
 import Data.Geometry.VectorMath
+#if defined(ghcjs_HOST_OS)
 import Data.Geometry.Quaternion
-
+#endif
 
 
 
@@ -70,6 +72,7 @@ class Monad s => SpaceTransform s (n :: Nat) t | s -> n, s -> t where
 "mergeFirst/any" mergeFirst = (<*>) :: (SpaceTransform z n t) => z (x -> y) -> z x -> z y
     #-}
 
+#if defined(ghcjs_HOST_OS)
 class ( Monad s
       , SpaceTransform s 3 t
       , Quaternion q t
@@ -84,6 +87,7 @@ class ( Monad s
     -- | Create transform from quaternion
     rotateScale :: q -> x -> s x
 
+#endif
 
 -- | Kind of object that can be transformed
 class Transformable x n t | x -> t where

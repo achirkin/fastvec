@@ -10,12 +10,15 @@
 --
 --
 -----------------------------------------------------------------------------
-
+{-# LANGUAGE CPP #-}
 module Data.Geometry.Transform
     ( module X
     ) where
 
 import Data.Geometry.Transform.SpaceTransform as X
 import Data.Geometry.Transform.Matrix4 as X
+#if defined(ghcjs_HOST_OS)
 import Data.Geometry.Transform.Quaternion as X
+#endif
+
 

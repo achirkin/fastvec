@@ -51,6 +51,11 @@ library
             Data.Geometry.Transform.SpaceTransform
             Data.Geometry.Quaternion
             Data.Geometry.Prim.JSNum
+        exposed-modules:
+            Data.Geometry
+            Data.Geometry.Approximate
+            Data.Geometry.VectorMath
+            Data.Geometry.Transform
         ghc-options: -Wall -O2 -fenable-rewrite-rules
 
     if !impl(ghcjs -any)
@@ -71,11 +76,9 @@ library
             Data.Geometry.Prim.FloatX4
             Data.Geometry.Prim.Int32X4
         ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
-    exposed-modules:
-        Data.Geometry
-        Data.Geometry.Approximate
-        Data.Geometry.VectorMath
-        Data.Geometry.Transform
+        exposed-modules:
+            Data.Geometry
+            Data.Geometry.VectorMath
     js-sources:
         prims/JSNumberOps.js
         prims/JSMatrix.js
