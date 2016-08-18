@@ -1,0 +1,7 @@
+flags: {}
+packages:
+  - .
+
+resolver: lts-6.2
+require-stack-version: ">= 1.0.2"
+extra-package-dbs: []
