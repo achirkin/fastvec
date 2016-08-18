@@ -17,6 +17,7 @@ cabal-dev
 .cabal-sandbox/
 cabal.sandbox.config
 cabal.config
+.stack-work
 
 # eclipse stuff
 .dist-buildwrapper/
