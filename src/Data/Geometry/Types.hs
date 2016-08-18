@@ -365,7 +365,10 @@ instance Vector3Math T where {                                  \
     vector3 (EC2(EC x)) (EC2(EC y)) (EC2(EC z))     \
         = VC (pack/**/VT (# x, y, z, 0/**/e #));                     \
     {-# INLINE matrix3x3 #-};                                   \
-    matrix3x3 (VC c1) (VC c2) (VC c3) = MC c1 c2 c3  }
+    matrix3x3 (VC c1) (VC c2) (VC c3) = MC c1 c2 c3; \
+    {-# INLINE unpackV3 #-};                                   \
+    unpackV3 (VC c) = case unpack/**/VT c of                 \
+       {(# r1, r2, r3, _ #) -> (EC2(EC r1), EC2(EC r2), EC2(EC r3))};    }
 
 VECTOR3MATH(Float,FloatX3#,V3F,M3F,F#,emptyc,.0#)
 VECTOR3MATH(CFloat,FloatX3#,V3CF,M3CF,F#,CFloat,.0#)
