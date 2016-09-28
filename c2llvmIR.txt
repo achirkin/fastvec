@@ -1,6 +1,8 @@
 To compile c primops into LLVM IR I use following commands:
 
-clang -mavx2 -Os -S -emit-llvm prims/FloatX4Ops.c -o prims/FloatX4Ops.ll && sed -i'' 's/call void/call cc 10 void/; s/define void/define cc 10 void/; s/, align 16,/, align 8,/;' prims/FloatX4Ops.ll
-clang -mavx2 -Os -S -emit-llvm prims/FloatX3Ops.c -o prims/FloatX3Ops.ll && sed -i'' 's/call void/call cc 10 void/; s/define void/define cc 10 void/; s/, align 16,/, align 8,/;' prims/FloatX3Ops.ll
-clang -mavx2 -Os -S -emit-llvm prims/Int32X4Ops.c -o prims/Int32X4Ops.ll && sed -i'' 's/call void/call cc 10 void/; s/define void/define cc 10 void/; s/, align 16,/, align 8,/;' prims/Int32X4Ops.ll
+clang-3.5 -mavx2 -Os -S -emit-llvm prims/FloatX4Ops.c -o prims/FloatX4Ops.ll && sed -i'' 's/call void/call cc 10 void/; s/define void/define cc 10 void/; s/, align 16,/, align 8,/;' prims/FloatX4Ops.ll
+clang-3.5 -mavx2 -Os -S -emit-llvm prims/FloatX3Ops.c -o prims/FloatX3Ops.ll && sed -i'' 's/call void/call cc 10 void/; s/define void/define cc 10 void/; s/, align 16,/, align 8,/;' prims/FloatX3Ops.ll
+clang-3.5 -mavx2 -Os -S -emit-llvm prims/Int32X4Ops.c -o prims/Int32X4Ops.ll && sed -i'' 's/call void/call cc 10 void/; s/define void/define cc 10 void/; s/, align 16,/, align 8,/;' prims/Int32X4Ops.ll
 
+
+ghc -c codegen/platformtest.cmm -ddump-llvm

@@ -1,4 +1,4 @@
-; ModuleID = 'prims/FloatX4.c'
+; ModuleID = 'prims/FloatX4Ops.c'
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
@@ -366,7 +366,7 @@ attributes #3 = { nounwind optsize }
 
 !llvm.ident = !{!0}
 
-!0 = metadata !{metadata !"Ubuntu clang version 3.5.2-2 (tags/RELEASE_352/final) (based on LLVM 3.5.2)"}
+!0 = metadata !{metadata !"Ubuntu clang version 3.5.2-3ubuntu1 (tags/RELEASE_352/final) (based on LLVM 3.5.2)"}
 !1 = metadata !{metadata !2, metadata !2, i64 0}
 !2 = metadata !{metadata !"long", metadata !3, i64 0}
 !3 = metadata !{metadata !"omnipotent char", metadata !4, i64 0}

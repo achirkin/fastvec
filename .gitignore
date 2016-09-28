@@ -28,6 +28,7 @@ docs/
 # leksah stuff
 *.lkshf
 *.lkshw
+*.lkshs
 
 # profiling
 *.hp
@@ -39,3 +40,7 @@ docs/
 
 # my own stuff
 *.nb
+
+# codegen
+codegen/Platform.hs
+codegen/platformtest.o

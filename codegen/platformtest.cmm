@@ -1,0 +1,4 @@
+platformtest(bits64 x)
+{
+  return (x);
+}
