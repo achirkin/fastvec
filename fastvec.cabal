@@ -135,4 +135,5 @@ executable codegen-test
         Llvm.Function
         Llvm.ProgramMonad
         Llvm.Numbers
+        Platform
 
