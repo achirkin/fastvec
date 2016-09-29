@@ -16,6 +16,7 @@ import Data.List (isPrefixOf)
 import Control.Monad (forM, unless)
 import System.Directory
 import System.FilePath
+import qualified Data.Map as Map (lookup)
 
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks
@@ -27,6 +28,7 @@ customBuildHook :: (PackageDescription -> LocalBuildInfo -> UserHooks -> BuildFl
                 -> PackageDescription -> LocalBuildInfo -> UserHooks -> BuildFlags -> IO ()
 customBuildHook bf packageDesc localBuildInfo userHooks buildFlags = do
 
+    -- print $ compilerProperties $ compiler localBuildInfo
     -- If building for the first time, generate platform-dependent LLVM headers
     testOnceCompiled <- doesFileExist ("codegen" </> "platformtest.o")
     platformhsExists <- doesFileExist ("codegen" </> "Platform.hs")
@@ -37,7 +39,7 @@ customBuildHook bf packageDesc localBuildInfo userHooks buildFlags = do
         let runghc = programInvocation ghc ["-ddump-llvm", "-c", "codegen" </> "platformtest.cmm"]
         putStrLn "Invoking test GHC run to compile .cmm into .ll to figure out proper target datalayout and triple..."
         platformTest <- lines <$> getProgramInvocationOutput deafening runghc
-        let (tDatalayout, tTriple) = (fromMaybe "target datalayout = \"\"" *** fromMaybe "target triple = \"\"") $ parseLlvmOutput platformTest
+        let (tDatalayout, tTriple) = (fromMaybe "" *** fromMaybe "") $ parseLlvmOutput platformTest
         putStrLn tDatalayout
         putStrLn tTriple
         writeFile ("codegen" </> "Platform.hs") . unlines $
@@ -69,7 +71,19 @@ customBuildHook bf packageDesc localBuildInfo userHooks buildFlags = do
     bf packageDesc lbf' userHooks buildFlags
   where
     ps = withPrograms localBuildInfo
-    mcprogram = (\p -> p { programDefaultArgs = [], programOverrideArgs = [] } ) <$> lookupProgram (simpleProgram "ghc") ps
+    mcprogram = (\p ->
+                  let xs = preserveLlvmArgs (programDefaultArgs p)
+                      ys0 = preserveLlvmArgs (programOverrideArgs p)
+                      ys1 = if "-pgmlc" `elem` xs || "-pgmlc" `elem` ys0
+                            then ys0
+                            else "-pgmlc":cllc:ys0
+                      ys2 = if "-pgmlo" `elem` xs || "-pgmlo" `elem` ys1
+                            then ys1
+                            else "-pgmlo":copt:ys1
+                   in p { programDefaultArgs  = xs
+                        , programOverrideArgs = ys2
+                        }
+                ) <$> lookupProgram (simpleProgram "ghc") ps
     updateOpts addedFiles (GHC, opts) = (GHC, opts ++ addedFiles)
     updateOpts _ xs = xs
     allDirsRec [] = return []
@@ -91,4 +105,17 @@ customBuildHook bf packageDesc localBuildInfo userHooks buildFlags = do
         | "target triple"     `isPrefixOf` x = (fst (parseLlvmOutput xs), Just x)
         | otherwise                          = parseLlvmOutput xs
     parseLlvmOutput [] = (Nothing,Nothing)
+
+    -- if we are in an unfriendly environment of ambiguous LLVM versions
+    -- hope that user specified a proper version in --ghc-options
+    preserveLlvmArgs ("-pgmlc":p:xs) = "-pgmlc":p:preserveLlvmArgs xs
+    preserveLlvmArgs ("-pgmlo":p:xs) = "-pgmlo":p:preserveLlvmArgs xs
+    preserveLlvmArgs (x:xs) = preserveLlvmArgs xs
+    preserveLlvmArgs [] = []
+
+
+    -- last resort: llc and opt might be specified in compiler properties
+    compilerProps = compilerProperties $ compiler localBuildInfo
+    cllc = fromMaybe "llc" $ Map.lookup "LLVM llc command" compilerProps
+    copt = fromMaybe "llc" $ Map.lookup "LLVM opt command" compilerProps
 
