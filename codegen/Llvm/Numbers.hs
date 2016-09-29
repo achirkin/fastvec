@@ -26,7 +26,7 @@ module Llvm.Numbers
   , LlvmNum (..), eBitWidth, eNumberType
   , Llvm.Numbers.isSigned, numberCat, eIsSigned, eNumberCat
   , LlvmFloating (..), LlvmIntegral (..)
-  , Numbers (..), dim, broadcast
+  , Numbers (..), dim, broadcast, hsNumberType
   , Float32, Float64
   , SInt01, SInt08, SInt16, SInt32, SInt64
   , UInt01, UInt08, UInt16, UInt32, UInt64
@@ -83,6 +83,8 @@ class (Eq (NVal t bits), Num (NVal t bits), Ord (NVal t bits), Show (NVal t bits
   data NVal t bits
   bitWidth :: Numbers t bits n -> Int
   numberType :: Numbers t bits n -> NumberType
+  hsTypeBase :: Numbers t bits n -> String
+
 
 eBitWidth :: LlvmNum t bits => NVal t bits -> Int
 eBitWidth = bitWidth . NConst
@@ -198,6 +200,10 @@ broadcast' 0 x = unsafeCoerce x
 broadcast' 1 x = unsafeCoerce x
 broadcast' n x = x :$ broadcast' (n-1) x
 
+hsNumberType :: (KnownNat n, LlvmNum t bits) => Numbers t bits n -> String
+hsNumberType v = hsTypeBase v ++ "X" ++ show (dim v) ++ "#"
+
+
 
 instance Eq (Numbers t bits n) where
   NConst a == NConst b = a == b
@@ -250,11 +256,13 @@ instance LlvmNum 'NT_FP 32 where
     deriving (Eq,Ord,Real,RealFrac,RealFloat,Num,Fractional,Floating)
   bitWidth _ = 32
   numberType _ = NT_FP
+  hsTypeBase _ = "Float"
 instance LlvmNum 'NT_FP 64 where
   newtype NVal 'NT_FP 64 = F64 Double
     deriving (Eq,Ord,Real,RealFrac,RealFloat,Num,Fractional,Floating)
   bitWidth _ = 64
   numberType _ = NT_FP
+  hsTypeBase _ = "Double"
 
 
 instance LlvmNum 'NT_INT 1 where
@@ -262,52 +270,62 @@ instance LlvmNum 'NT_INT 1 where
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Enum)
   bitWidth _ = 1
   numberType _ = NT_INT
+  hsTypeBase _ = "Int8"
 instance LlvmNum 'NT_INT 8 where
   newtype NVal 'NT_INT 8 = I8 Int8
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 8
   numberType _ = NT_INT
+  hsTypeBase _ = "Int8"
 instance LlvmNum 'NT_INT 16 where
   newtype NVal 'NT_INT 16 = I16 Int16
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 16
   numberType _ = NT_INT
+  hsTypeBase _ = "Int16"
 instance LlvmNum 'NT_INT 32 where
   newtype NVal 'NT_INT 32 = I32 Int32
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 32
   numberType _ = NT_INT
+  hsTypeBase _ = "Int32"
 instance LlvmNum 'NT_INT 64 where
   newtype NVal 'NT_INT 64 = I64 Int64
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 64
   numberType _ = NT_INT
+  hsTypeBase _ = "Int64"
 
 instance LlvmNum 'NT_WORD 1 where
   newtype NVal 'NT_WORD 1 = W1 Bool
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Enum)
   bitWidth _ = 1
   numberType _ = NT_WORD
+  hsTypeBase _ = "Word8"
 instance LlvmNum 'NT_WORD 8 where
   newtype NVal 'NT_WORD 8 = W8 Word8
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 8
   numberType _ = NT_WORD
+  hsTypeBase _ = "Word8"
 instance LlvmNum 'NT_WORD 16 where
   newtype NVal 'NT_WORD 16 = W16 Word16
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 16
   numberType _ = NT_WORD
+  hsTypeBase _ = "Word16"
 instance LlvmNum 'NT_WORD 32 where
   newtype NVal 'NT_WORD 32 = W32 Word32
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 32
   numberType _ = NT_WORD
+  hsTypeBase _ = "Word32"
 instance LlvmNum 'NT_WORD 64 where
   newtype NVal 'NT_WORD 64 = W64 Word64
     deriving (Eq,Ord,Bits,FiniteBits,Bounded,Num,Enum,Real,Integral)
   bitWidth _ = 64
   numberType _ = NT_WORD
+  hsTypeBase _ = "Word64"
 
 instance Show (NVal 'NT_FP 32) where
   show (F32 x) = show x

@@ -16,7 +16,7 @@
 
 module Llvm.Function
   ( FInfo (..), LlvmFunctionInputs (..), LlvmFunctionOutputs (..), LlvmFunction
-  , genCode, ireg
+  , genCode, ireg -- , genImportPrim
   , VarArg (..), popArgs, pushArgs
   ) where
 
@@ -42,15 +42,28 @@ data FInfo = FInfo
 
 class LlvmFunctionInputs x where
   genInput :: String -> L (x, FInfo)
-
+--  -- | Input signature, e.g. FloatX4# -> FloatX4# ->
+--  --   Must not depend on actual value (i.e. must allow bottom)
+--  hsInput :: x -> String
 
 class LlvmFunctionOutputs x where
   genOutput :: FInfo -> x -> L ()
+--  -- | Input signature, e.g. (# FloatX4#, FloatX4# #)
+--  --   Must not depend on actual value (i.e. must allow bottom)
+--  hsOutput :: x -> String
 
-genCode :: ( LlvmFunctionInputs inputs
-           , LlvmFunctionOutputs outputs
-           , LlvmCode outputs
-           )
+--genImportPrim :: LlvmFunction inputs outputs
+--              => String -> (inputs -> outputs) -> String
+--genImportPrim fname f = "foreign import prim \"" ++ fname ++ "\" "
+--      ++ fname ++ "# :: " ++ hsInput x ++ hsOutput y
+--  where
+--    x = getArgType f
+--    y = f x
+
+--getArgType :: (a -> b) -> a
+--getArgType _ = undefined
+
+genCode :: LlvmFunction inputs outputs
         => String -> (inputs -> outputs) -> (String, OrderedList String)
 genCode fname f = runL eprog $ do
   (args, finfo) <- genInput fname
