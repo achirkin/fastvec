@@ -6,3 +6,6 @@ clang-3.5 -mavx2 -Os -S -emit-llvm prims/Int32X4Ops.c -o prims/Int32X4Ops.ll && 
 
 
 ghc -c codegen/platformtest.cmm -ddump-llvm
+
+for running stack with pre-defined llvm version try:
+stack build --ghc-options="-pgmlc /usr/bin/llc-3.7 -pgmlo /usr/bin/opt-3.7"
