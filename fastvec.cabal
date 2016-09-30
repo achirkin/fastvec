@@ -19,27 +19,26 @@ description:
     for vector operations like dot products or matrix products I use separate classes.
 category: Math, Geometry
 author: Artem M. Chirkin <chirkin@arch.ethz.ch>
-
 extra-source-files:
     codegen/platformtest.cmm
 extra-tmp-files:
     codegen/platformtest.o
     codegen/Platform.hs
+    src/Data/Geometry/Prim/*.hs
+    src/Data/Geometry/Prim/*.ll
+    src/Data/Geometry/Prim
 
 source-repository head
     type: git
     location: git://github.com/achirkin/fastvec.git
 
-
 flag sse
     description:
         Use SSE2 intrinsics
-    default: True
 
 flag avx
     description:
         Use avx intrinsics
-    default: True
 
 flag avx2
     description:
@@ -56,30 +55,33 @@ flag neon
         Use NEON intrinsics on arm machines (sorry, arm is not available yet)
     default: False
 
-
 library
 
     if flag(avx512)
-      cpp-options: -DUSING_VECTORS_AVX512 -DUSING_VECTORS_AVX2 -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
-      ghc-options: -Wall -fllvm -O2 -mavx512f -fenable-rewrite-rules
+        cpp-options: -DUSING_VECTORS_AVX512 -DUSING_VECTORS_AVX2
+                     -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
+        ghc-options: -Wall -fllvm -O2 -mavx512f -fenable-rewrite-rules
     else
-      if flag(avx2)
-        cpp-options: -DUSING_VECTORS_AVX2 -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
-        ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
-      else
-        if flag(avx)
-          cpp-options: -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
-          ghc-options: -Wall -fllvm -O2 -mavx -fenable-rewrite-rules
+
+        if flag(avx2)
+            cpp-options: -DUSING_VECTORS_AVX2 -DUSING_VECTORS_AVX
+                         -DUSING_VECTORS_SSE
+            ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
         else
-          if flag(sse)
-            cpp-options: -DUSING_VECTORS_SSE
-            ghc-options: -Wall -fllvm -O2 -msse2 -fenable-rewrite-rules
-          else
-            ghc-options: -Wall -fllvm -O2 -fenable-rewrite-rules
+
+            if flag(avx)
+                cpp-options: -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
+                ghc-options: -Wall -fllvm -O2 -mavx -fenable-rewrite-rules
+            else
+
+                if flag(sse)
+                    cpp-options: -DUSING_VECTORS_SSE
+                    ghc-options: -Wall -fllvm -O2 -msse2 -fenable-rewrite-rules
+                else
+                    ghc-options: -Wall -fllvm -O2 -fenable-rewrite-rules
 
     if flag(neon)
-      cpp-options: -DUSING_VECTORS_NEON
-
+        cpp-options: -DUSING_VECTORS_NEON
 
     exposed-modules:
         Data.Geometry
@@ -94,29 +96,33 @@ library
         Data.Geometry.Prim.FloatX4
         Data.Geometry.Types.FloatX4
 
-
-executable codegen-test
+executable codegen
 
     if flag(avx512)
-      cpp-options: -DUSING_VECTORS_AVX512 -DUSING_VECTORS_AVX2 -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
-      ghc-options: -Wall -fllvm -O2 -mavx512f -fenable-rewrite-rules
+        cpp-options: -DUSING_VECTORS_AVX512 -DUSING_VECTORS_AVX2
+                     -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
+        ghc-options: -Wall -fllvm -O2 -mavx512f -fenable-rewrite-rules
     else
-      if flag(avx2)
-        cpp-options: -DUSING_VECTORS_AVX2 -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
-        ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
-      else
-        if flag(avx)
-          cpp-options: -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
-          ghc-options: -Wall -fllvm -O2 -mavx -fenable-rewrite-rules
+
+        if flag(avx2)
+            cpp-options: -DUSING_VECTORS_AVX2 -DUSING_VECTORS_AVX
+                         -DUSING_VECTORS_SSE
+            ghc-options: -Wall -fllvm -O2 -mavx2 -fenable-rewrite-rules
         else
-          if flag(sse)
-            cpp-options: -DUSING_VECTORS_SSE
-            ghc-options: -Wall -fllvm -O2 -msse2 -fenable-rewrite-rules
-          else
-            ghc-options: -Wall -fllvm -O2 -fenable-rewrite-rules
+
+            if flag(avx)
+                cpp-options: -DUSING_VECTORS_AVX -DUSING_VECTORS_SSE
+                ghc-options: -Wall -fllvm -O2 -mavx -fenable-rewrite-rules
+            else
+
+                if flag(sse)
+                    cpp-options: -DUSING_VECTORS_SSE
+                    ghc-options: -Wall -fllvm -O2 -msse2 -fenable-rewrite-rules
+                else
+                    ghc-options: -Wall -fllvm -O2 -fenable-rewrite-rules
 
     if flag(neon)
-      cpp-options: -DUSING_VECTORS_NEON
+        cpp-options: -DUSING_VECTORS_NEON
 
     main-is: codegen.hs
     build-depends:
@@ -128,6 +134,8 @@ executable codegen-test
     default-language: Haskell2010
     hs-source-dirs: codegen
     other-modules:
+        Data.Geometry.Gen
+        Data.Geometry.Gen.FloatX4
         Llvm
         Llvm.Arch.CodeAMD64
         Llvm.BaseClass

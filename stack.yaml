@@ -4,7 +4,7 @@ packages:
 
 ghc-options:
   # All packages
-  "*": -Wall -pgmlo opt -pgmlc llc
+  "*": -Wall -pgmlo opt-3.7 -pgmlc llc-3.7
   
 resolver: lts-7.0
 require-stack-version: ">= 1.0.2"

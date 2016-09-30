@@ -1,3 +1,5 @@
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TypeOperators, GADTs #-}
 {-# LANGUAGE KindSignatures, DataKinds #-}
 {-# LANGUAGE ConstraintKinds #-}
@@ -16,8 +18,11 @@
 
 module Llvm.Function
   ( FInfo (..), LlvmFunctionInputs (..), LlvmFunctionOutputs (..), LlvmFunction
-  , genCode, ireg -- , genImportPrim
+  , genCode, ireg, genImportPrim
   , VarArg (..), popArgs, pushArgs
+  -- actual definitions
+  , FName (..), funcName, DefineFunction (..)
+  , LlvmModule (..)
   ) where
 
 import GHC.TypeLits
@@ -27,11 +32,8 @@ import Llvm.Expression
 import Llvm.ProgramMonad
 import Unsafe.Coerce (unsafeCoerce)
 import Control.Arrow (Arrow(..))
-
+import Data.List (intercalate)
 import Data.Monoid
-
---class LlvmFunction inputs outputs where
---  genCode :: String -> (inputs -> E outputs) -> String
 
 data FInfo = FInfo
   { baseReg :: HsPointer
@@ -40,39 +42,47 @@ data FInfo = FInfo
   , stackLimit  :: HsWord
   }
 
-class LlvmFunctionInputs x where
+class HsFunctionInputs x => LlvmFunctionInputs x where
   genInput :: String -> L (x, FInfo)
---  -- | Input signature, e.g. FloatX4# -> FloatX4# ->
---  --   Must not depend on actual value (i.e. must allow bottom)
---  hsInput :: x -> String
 
-class LlvmFunctionOutputs x where
+class HsFunctionOutputs x => LlvmFunctionOutputs x where
   genOutput :: FInfo -> x -> L ()
---  -- | Input signature, e.g. (# FloatX4#, FloatX4# #)
---  --   Must not depend on actual value (i.e. must allow bottom)
---  hsOutput :: x -> String
 
---genImportPrim :: LlvmFunction inputs outputs
---              => String -> (inputs -> outputs) -> String
---genImportPrim fname f = "foreign import prim \"" ++ fname ++ "\" "
---      ++ fname ++ "# :: " ++ hsInput x ++ hsOutput y
---  where
---    x = getArgType f
---    y = f x
 
---getArgType :: (a -> b) -> a
---getArgType _ = undefined
+class HsFunctionInputs x where
+  -- | Input signature, e.g. FloatX4# -> FloatX4# ->
+  --   Must not depend on actual value (i.e. must allow bottom)
+  hsInput :: x -> String
 
+class HsFunctionOutputs x where
+  -- | Input signature, e.g. (# FloatX4#, FloatX4# #)
+  --   Must not depend on actual value (i.e. must allow bottom)
+  hsOutput :: x -> String
+
+
+-- | Generate "foreign import prim" declaration in Haskell
+genImportPrim :: LlvmFunction inputs outputs
+              => String -> (inputs -> outputs) -> String
+genImportPrim fn f = "foreign import prim \"" ++ fn ++ "\" "
+      ++ fn ++ "# :: " ++ hsInput x ++ hsOutput y
+  where
+    x = getArgType f
+    y = f x
+
+getArgType :: (a -> b) -> a
+getArgType _ = undefined
+
+-- | Generate function implementation in LLVM IR
 genCode :: LlvmFunction inputs outputs
         => String -> (inputs -> outputs) -> (String, OrderedList String)
-genCode fname f = runL eprog $ do
-  (args, finfo) <- genInput fname
+genCode fn f = runL eprog $ do
+  (args, finfo) <- genInput fn
   genOutput finfo (f args)
 
 ireg :: HsInt
 ireg = undef
 
-type LlvmFunction inputs outputs = (LlvmFunctionInputs inputs, LlvmFunctionOutputs outputs, LlvmCode outputs)
+type LlvmFunction inputs outputs = (LlvmFunctionInputs inputs, LlvmFunctionOutputs outputs)
 
 
 data VarArg (n::Nat) x where
@@ -110,7 +120,205 @@ eFst _ = Dummy
 
 data Dummy (n::Nat) = Dummy
 
+vproxy :: VarArg n a -> Dummy n
+vproxy _ = Dummy
+
+argNum :: KnownNat n => VarArg n a -> Int
+argNum = fromInteger . natVal . vproxy
 
 pushArgs :: LlvmCode a => Pointer HsWord -> VarArg n a -> L (Pointer HsWord)
 pushArgs ptr (x :& xs) = pushStack ptr x >>= flip pushArgs xs
 pushArgs ptr NoArgs = return ptr
+
+
+
+
+data FName (name::Symbol) = FName
+
+funcName :: KnownSymbol name => FName name -> String
+funcName = symbolVal
+
+
+
+
+class LlvmFunction inputs outputs => DefineFunction (name::Symbol) inputs outputs | name -> inputs, name -> outputs where
+  -- | Use this function to type in EDSL to be compiled into LLVM IR.
+  --   First parameter is used only for a type inference
+  code :: FName name -> inputs -> outputs
+
+
+
+-- | Helper typeclass -- instances generated in genDefs TH function.
+--   Executing function defined in instances does actual codegen job.
+class LlvmModule (name::Symbol) where
+  moduleCodegen :: FName name -> IO ()
+  moduleDefgen  :: FName name -> IO ()
+
+
+
+
+
+
+
+
+enforceType :: a -> a -> a
+enforceType _ = id
+
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n)) where
+  hsInput args = t
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n)) where
+  hsInput args = concat (replicate 2 t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsInput args = concat (replicate 3 t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsInput args = concat (replicate 4 t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex,ex)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsInput args = concat (replicate 5 t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex,ex,ex)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsInput args = concat (replicate 6 t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex,ex,ex,ex)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, KnownNat k, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)
+                             , E (Numbers t b k)) where
+  hsInput args = concat (replicate (6 + k) t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      y = broadcast (NConst 0)
+      ey = OpConst y
+      k = dim y `div` dim x
+      _cast = enforceType args (ex,ex,ex,ex,ex,ex,ey)
+      t = hsNumberType x ++ " -> "
+
+instance (KnownNat n, KnownNat k, LlvmNum t b)
+         => HsFunctionInputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)
+                             , VarArg k (E (Numbers t b n))) where
+  hsInput args = concat (replicate (6 + k) t)
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      k = argNum va
+      (_,_,_,_,_,_,va) = enforceType args (ex,ex,ex,ex,ex,ex,undefined)
+      t = hsNumberType x ++ " -> "
+
+
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n)) where
+  hsOutput args = t
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex)
+      t = hsNumberType x
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n)) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate 2 t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex)
+      t = hsNumberType x
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate 3 t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex)
+      t = hsNumberType x
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate 4 t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex,ex)
+      t = hsNumberType x
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate 5 t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex,ex,ex)
+      t = hsNumberType x
+
+instance (KnownNat n, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate 6 t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      _cast = enforceType args (ex,ex,ex,ex,ex,ex)
+      t = hsNumberType x
+
+instance (KnownNat n, KnownNat k, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)
+                              , E (Numbers t b k)) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate (6 + k) t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      y = broadcast (NConst 0)
+      ey = OpConst y
+      k = dim y `div` dim x
+      _cast = enforceType args (ex,ex,ex,ex,ex,ex,ey)
+      t = hsNumberType x
+
+instance (KnownNat n, KnownNat k, LlvmNum t b)
+         => HsFunctionOutputs ( E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n), E (Numbers t b n)
+                              , VarArg k (E (Numbers t b n))) where
+  hsOutput args = "(# " ++ (intercalate ", " $ replicate (6 + k) t) ++ " #)"
+    where
+      x = broadcast (NConst 0)
+      ex = OpConst x
+      k = argNum va
+      (_,_,_,_,_,_,va) = enforceType args (ex,ex,ex,ex,ex,ex,undefined)
+      t = hsNumberType x

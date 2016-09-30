@@ -245,7 +245,6 @@ pushStack sp x = do
 
 opConst :: ( LlvmNum t bits
            , KnownNat n
-           , 1 <= n
            )
         => NVal t bits -> E (Numbers t bits n)
 opConst = OpConst . broadcast . NConst
@@ -300,4 +299,35 @@ instance ( LlvmNum 'NT_WORD bits
   fromInteger = opConst . fromInteger
 
 
+-- Vector types that are defined in Haskell (ghc-prim)
 
+type Int8X16'   = E (Numbers 'NT_INT   8 16)
+type Int16X8'   = E (Numbers 'NT_INT  16  8)
+type Int32X4'   = E (Numbers 'NT_INT  32  4)
+type Int64X2'   = E (Numbers 'NT_INT  64  2)
+type Int8X32'   = E (Numbers 'NT_INT   8 32)
+type Int16X16'  = E (Numbers 'NT_INT  16 16)
+type Int32X8'   = E (Numbers 'NT_INT  32  8)
+type Int64X4'   = E (Numbers 'NT_INT  64  4)
+type Int8X64'   = E (Numbers 'NT_INT   8 64)
+type Int16X32'  = E (Numbers 'NT_INT  16 32)
+type Int32X16'  = E (Numbers 'NT_INT  32 16)
+type Int64X8'   = E (Numbers 'NT_INT  64  8)
+type Word8X16'  = E (Numbers 'NT_WORD  8 16)
+type Word16X8'  = E (Numbers 'NT_WORD 16  8)
+type Word32X4'  = E (Numbers 'NT_WORD 32  4)
+type Word64X2'  = E (Numbers 'NT_WORD 64  2)
+type Word8X32'  = E (Numbers 'NT_WORD  8 32)
+type Word16X16' = E (Numbers 'NT_WORD 16 16)
+type Word32X8'  = E (Numbers 'NT_WORD 32  8)
+type Word64X4'  = E (Numbers 'NT_WORD 64  4)
+type Word8X64'  = E (Numbers 'NT_WORD  8 64)
+type Word16X32' = E (Numbers 'NT_WORD 16 32)
+type Word32X16' = E (Numbers 'NT_WORD 32 16)
+type Word64X8'  = E (Numbers 'NT_WORD 64  8)
+type FloatX4'   = E (Numbers 'NT_FP   32  4)
+type DoubleX2'  = E (Numbers 'NT_FP   64  2)
+type FloatX8'   = E (Numbers 'NT_FP   32  8)
+type DoubleX4'  = E (Numbers 'NT_FP   64  4)
+type FloatX16'  = E (Numbers 'NT_FP   32 16)
+type DoubleX8'  = E (Numbers 'NT_FP   64  8)
