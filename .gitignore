@@ -42,5 +42,6 @@ docs/
 *.nb
 
 # codegen
-#codegen/Platform.hs
-#codegen/platformtest.o
+codegen/Platform.hs
+codegen/platformtest.o
+src/Data/Geometry/Prim

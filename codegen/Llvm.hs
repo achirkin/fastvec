@@ -43,7 +43,6 @@ writeAllFilesFun :: Q [Dec]
 writeAllFilesFun = do
   ClassI _ instances <- reify ''LlvmModule
   let calls = DoE $ instances >>= map NoBindS . genWriteCall
-  runIO $ print instances
   [d| writeAllFiles :: IO ()
       writeAllFiles = $(pure calls)
    |]
