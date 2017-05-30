@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, TypeFamilies, DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -pgmP cpphs -optP-traditional -optP--cpp #-}
 #if defined(ghcjs_HOST_OS)
 {-# LANGUAGE ScopedTypeVariables #-}
 #else

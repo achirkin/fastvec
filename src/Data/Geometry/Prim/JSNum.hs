@@ -1,5 +1,6 @@
 {-# LANGUAGE JavaScriptFFI, GHCForeignImportPrim #-}
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -pgmP cpphs -optP-traditional -optP--cpp #-}
 {-# LANGUAGE MagicHash, UnboxedTuples, PolyKinds #-}
 {-# LANGUAGE UnliftedFFITypes #-}
 -----------------------------------------------------------------------------

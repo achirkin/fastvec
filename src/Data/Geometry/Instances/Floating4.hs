@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, TypeFamilies, DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -pgmP cpphs -optP-traditional -optP--cpp #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Geometry.Instances.Floating4

@@ -27,6 +27,7 @@ source-repository head
 library
 
     if impl(ghcjs -any)
+        build-tools: cpphs
         build-depends:
             base >=4.8.0.0 && <5,
             ghcjs-hs-interop -any
