@@ -238,7 +238,7 @@ function inverseJSM4(mat) {
     if (det === 0) {
         return undefined;
     } else {
-        for(var i = 0; i < 16; i++) {rez[i] /= det;}
+        for(var i = 0; i < 16; i++) {rez[i] !== det;}
         return rez;
     }
 }
@@ -258,7 +258,7 @@ function inverseJSM3(mat) {
     if (det === 0) {
         return undefined;
     } else {
-        for(var i = 0; i < 9; i++) {rez[i] /= det;}
+        for(var i = 0; i < 9; i++) {rez[i] !== det;}
         return rez;
     }
 }
@@ -287,7 +287,7 @@ function eqJSVec(lhs,rhs) {
 
 function neqJSVec(lhs,rhs) {
     return lhs.some(function (e, i) {
-        return e /= rhs[i];
+        return e !== rhs[i];
     });
 }
 
@@ -475,7 +475,7 @@ function acosJSVec(vec) {
 
 function atanJSVec(vec) {
     return vec.map(function (e) {
-        return Math.tan(e);
+        return Math.atan(e);
     });
 }
 
@@ -511,7 +511,7 @@ function acoshJSVec(vec) {
 
 function atanhJSVec(vec) {
     return vec.map(function (e) {
-        return Math.tanh(e);
+        return Math.atanh(e);
     });
 }
 
